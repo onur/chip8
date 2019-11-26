@@ -1,0 +1,9 @@
+[package]
+name = "chip8"
+version = "0.1.0"
+authors = ["Onur Aslan <onuraslan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.7"
+minifb = "0.13"

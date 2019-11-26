@@ -1,0 +1,10 @@
+[book]
+authors = ["Onur Aslan"]
+language = "tr"
+multilingual = false
+src = "."
+title = "Rust ile CHIP-8 Emülatörü Geliştirme"
+
+[output.html]
+git-repository-url = "https://github.com/onur/chip8"
+git-repository-icon = "fa-github"
