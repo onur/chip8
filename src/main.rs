@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 #![warn(clippy::pedantic)]
+#![allow(clippy::unreadable_literal)]
 
 mod display;
 mod emulator;
