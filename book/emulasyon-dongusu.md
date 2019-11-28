@@ -29,7 +29,7 @@ metodu, çizim yapmasak bile basılan tuşları alabilmemiz için çalıştırma
 gereken bir metod.
 
 ```rust,no_run,noplaypen
-{{#include ../src/emulator.rs:274:298}}
+{{#include ../src/emulator.rs:274:279}}
 ```
 
 Burada penceremizden basılan tuşların bir listesini alıyoruz. Bu fonksiyon
