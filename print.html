@@ -789,31 +789,6 @@ oluşturan yeni bir fonksiyon tanımlayalım.</p>
     }
 }
 </code></pre>
-<p>Bu kod bloğunu satır satır inceleyelim:</p>
-<p><code>impl</code> anahtar kelimesi ve yapı adıyla başlayan bu satır, parantezler
-içerisinde yer alan fonksiyon ve method tanımlamalarının, bu yapı için
-kullanılacağını belirtir. <code>impl</code> ile sadece kendi paketiniz içerisinde
-oluşturduğunuz yapılar için fonksiyon ve methodlar ekleyebilirsiniz. Eğer
-başka bir pakette veya standart kütüphanede yer alan başka bir yapıya yeni
-bir fonksiyon eklemek isterseniz, yeni bir yapı oluşturmanız gerekmektedir.</p>
-<p>Emulator yapımızın hiç bir alanı açık (public) olmadığından, bu yapının
-instance'ını sadece bu yapı içinde tanımlanmış fonksiyon ve metodlardan
-erişebilirsiniz. Bu modül dışında Emulator yapısını direkt <code>Emulator { ... }</code>
-şeklinde oluşturmaya çalışırsanız, alanların public olmadığına dair hata
-alırsınız.</p>
-<pre><code class="language-rust no_run noplaypen">        let mut emulator = Emulator {
-            memory: [0; 4096],
-            v: [0; 16],
-            i: 0x200,
-            pc: 0x200,
-            stack: [0; 16],
-            sp: 0,
-            delay_timer: 0,
-            sound_timer: 0,
-            display: Display::new(),
-            keyboard: Keyboard::new(),
-        };
-</code></pre>
 <p>Değişken tanımlamaları <code>let</code> anahtar kelimesi ile yapılır. Rust'ta her
 değişken varsayılan olarak immutable (içeriği değiştirilemez) haldedir. Biz
 fonksiyonumuzun devamında, emülatör belleğine font setini yükleyeceğimizden
@@ -832,7 +807,7 @@ klavye işlemlerinin yapıldığı bu yapılar ileride anlatılacaktır.</p>
 <p>CHIP-8: 0 dan F'e olmak üzere 5 byte uzunluğunda sprite gösterme özelliğine
 sahiptir (16*5=80). Bu font bilgisi daha önce tanımlanmış bir değişken
 üzerinden emülatör belleğine yüklenir. <code>FONTSET</code> array'ının içeriğini
-<a href="https://github.com/onur/chip8/blob/master/src/emulator.rs#L302-L308">kaynak kodlarında</a>
+<a href="https://github.com/onur/chip8/blob/master/src/emulator.rs#L300-L306">kaynak kodlarında</a>
 görebilirsiniz. Rust'ta arraylar
 <a href="https://doc.rust-lang.org/std/iter/index.html#iterator"><code>Iterator</code></a>
 özelliğine sahip olduğundan <code>iter()</code> metodu yardımıyla kolayca
@@ -1447,25 +1422,6 @@ gereken bir metod.</p>
                     self.keyboard.release_key();
                 }
             }
-
-            let instruction = self.instruction_oku().expect(&quot;Bilinmeyen Instruction&quot;);
-            self.instruction_calistir(instruction);
-
-            if self.delay_timer &gt; 0 {
-                self.delay_timer -= 1;
-            }
-
-            if self.sound_timer &gt; 0 {
-                if self.sound_timer == 1 {
-                    println!(&quot;BEEP!&quot;);
-                }
-                self.sound_timer -= 1;
-            }
-
-            sleep(Duration::from_millis(5));
-        }
-    }
-}
 </code></pre>
 <p>Burada penceremizden basılan tuşların bir listesini alıyoruz. Bu fonksiyon
 <code>Option</code> dönen bir fonksiyon olduğundan, Rust'a ait <code>if let</code> sözdizimini

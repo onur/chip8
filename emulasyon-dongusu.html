@@ -206,25 +206,6 @@ gereken bir metod.</p>
                     self.keyboard.release_key();
                 }
             }
-
-            let instruction = self.instruction_oku().expect(&quot;Bilinmeyen Instruction&quot;);
-            self.instruction_calistir(instruction);
-
-            if self.delay_timer &gt; 0 {
-                self.delay_timer -= 1;
-            }
-
-            if self.sound_timer &gt; 0 {
-                if self.sound_timer == 1 {
-                    println!(&quot;BEEP!&quot;);
-                }
-                self.sound_timer -= 1;
-            }
-
-            sleep(Duration::from_millis(5));
-        }
-    }
-}
 </code></pre>
 <p>Burada penceremizden basılan tuşların bir listesini alıyoruz. Bu fonksiyon
 <code>Option</code> dönen bir fonksiyon olduğundan, Rust'a ait <code>if let</code> sözdizimini
