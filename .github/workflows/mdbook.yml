@@ -13,6 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Get mdbook
-      run: wget https://github.com/rust-lang/mdBook/releases/download/v0.3.5/mdbook-v0.3.5-x86_64-unknown-linux-gnu.tar.gz -O - | tar xzf - -C /usr/local/bin
+      run: wget https://github.com/rust-lang/mdBook/releases/download/v0.3.5/mdbook-v0.3.5-x86_64-unknown-linux-gnu.tar.gz -O - | tar xzf -
     - name: Build Book
-      run: cd book && mdbook build
+      run: cd book && ../mdbook build
