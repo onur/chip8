@@ -9,6 +9,11 @@ jobs:
     - uses: actions/checkout@v1
     - name: rustc version
       run: rustc --version
+    - name: Cache
+      uses: actions/cache@v1
+      with:
+        path: target
+        key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
