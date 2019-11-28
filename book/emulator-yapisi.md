@@ -24,25 +24,6 @@ impl Emulator {
 }
 ```
 
-Bu kod bloğunu satır satır inceleyelim:
-
-`impl` anahtar kelimesi ve yapı adıyla başlayan bu satır, parantezler
-içerisinde yer alan fonksiyon ve method tanımlamalarının, bu yapı için
-kullanılacağını belirtir. `impl` ile sadece kendi paketiniz içerisinde
-oluşturduğunuz yapılar için fonksiyon ve methodlar ekleyebilirsiniz. Eğer
-başka bir pakette veya standart kütüphanede yer alan başka bir yapıya yeni
-bir fonksiyon eklemek isterseniz, yeni bir yapı oluşturmanız gerekmektedir.
-
-Emulator yapımızın hiç bir alanı açık (public) olmadığından, bu yapının
-instance'ını sadece bu yapı içinde tanımlanmış fonksiyon ve metodlardan
-erişebilirsiniz. Bu modül dışında Emulator yapısını direkt `Emulator { ... }`
-şeklinde oluşturmaya çalışırsanız, alanların public olmadığına dair hata
-alırsınız.
-
-```rust,no_run,noplaypen
-{{#include ../src/emulator.rs:47:58}}
-```
-
 Değişken tanımlamaları `let` anahtar kelimesi ile yapılır. Rust'ta her
 değişken varsayılan olarak immutable (içeriği değiştirilemez) haldedir. Biz
 fonksiyonumuzun devamında, emülatör belleğine font setini yükleyeceğimizden
@@ -63,7 +44,7 @@ klavye işlemlerinin yapıldığı bu yapılar ileride anlatılacaktır.
 CHIP-8: 0 dan F'e olmak üzere 5 byte uzunluğunda sprite gösterme özelliğine
 sahiptir (16\*5=80). Bu font bilgisi daha önce tanımlanmış bir değişken
 üzerinden emülatör belleğine yüklenir. `FONTSET` array'ının içeriğini
-[kaynak kodlarında](https://github.com/onur/chip8/blob/master/src/emulator.rs#L302-L308)
+[kaynak kodlarında](https://github.com/onur/chip8/blob/master/src/emulator.rs#L300-L306)
 görebilirsiniz. Rust'ta arraylar
 [`Iterator`](https://doc.rust-lang.org/std/iter/index.html#iterator)
 özelliğine sahip olduğundan `iter()` metodu yardımıyla kolayca
