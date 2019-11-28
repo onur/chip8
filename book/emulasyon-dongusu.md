@@ -67,7 +67,7 @@ program çalıştığında, program argümanlarını almamıza yarayacak
 `std::env::args` fonksiyonunu dahil edelim ve main fonksiyonumuzu yazalım:
 
 ```rust,no_run,noplaypen
-{{#include ../src/main.rs:10:17}}
+{{#include ../src/main.rs:14:21}}
 ```
 
 `args().nth(1).unwrap_or_else(|| "brix.ch8".to_string())` söz dizimi,
