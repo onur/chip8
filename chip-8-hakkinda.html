@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html lang="tr" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>CHIP-8 Hakkında - Rust ile CHIP-8 Emülatörü Geliştirme</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="giris.html">Rust ile CHIP-8 Emülatörü Geliştirme</a></li><li class="expanded affix "><a href="chip-8-hakkinda.html" class="active">CHIP-8 Hakkında</a></li><li class="expanded "><a href="baslangic.html"><strong aria-hidden="true">1.</strong> Başlangıç</a></li><li class="expanded "><a href="opcode-yapisi.html"><strong aria-hidden="true">2.</strong> Opcode Yapısı</a></li><li class="expanded "><a href="instruction-yapisi.html"><strong aria-hidden="true">3.</strong> Instruction Yapısı</a></li><li class="expanded "><a href="emulator-yapisi.html"><strong aria-hidden="true">4.</strong> Emülatör Yapısı</a></li><li><ol class="section"><li class="expanded "><a href="rom-okunmasi.html"><strong aria-hidden="true">4.1.</strong> ROM Okunması</a></li><li class="expanded "><a href="instructionlarin-alinmasi.html"><strong aria-hidden="true">4.2.</strong> Instruction'ların Alınması</a></li><li class="expanded "><a href="instructionlarin-calistirilmasi.html"><strong aria-hidden="true">4.3.</strong> Instruction'ların Çalıştırılması</a></li></ol></li><li class="expanded "><a href="goruntu-yapisi.html"><strong aria-hidden="true">5.</strong> Görüntü Yapısı</a></li><li class="expanded "><a href="klavye-yapisi.html"><strong aria-hidden="true">6.</strong> Klayve Yapısı</a></li><li class="expanded "><a href="emulasyon-dongusu.html"><strong aria-hidden="true">7.</strong> Emülasyon Döngüsü</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Rust ile CHIP-8 Emülatörü Geliştirme</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                            <a href="https://github.com/onur/chip8" title="Git repository" aria-label="Git repository">
+                                <i id="git-repository-button" class="fa fa-github"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#chip-8-hakkında" id="chip-8-hakkında">CHIP-8 Hakkında</a></h1>
+<p>CHIP-8 1970'lerin sonunda 1980'lerin başında kendi kendine yap (DIY)
+bilgisayar sistemleri için kullanılmış, basit, yorumlanan bir programlama
+dilidir. The COSMAC VIP, DREAM 6800 ve ETI 660 bu bilgisayarlar için birer
+örnektir.</p>
+<p><img src="./images/640px-Space_intercept.png" alt="Telmac" /></p>
+<p><em>Telmac 1800, CHIP-8 oyunu Space Intercept çalıştırıyor.</em></p>
+<p>Bu sayfanın geri kalanı referans niteliğindedir ve ihtiyaç duyulduğunda
+geri dönüp tekrar bakılmak üzere hazırlanmıştır. İsterseniz bu sayfayı
+okumayı geçebilirsiniz, yine de bir göz gezdirmenizde fayda var.</p>
+<h2><a class="header" href="#chip-8-Özellikleri" id="chip-8-Özellikleri">CHIP-8 Özellikleri</a></h2>
+<h3><a class="header" href="#1-bellek" id="1-bellek">1. Bellek</a></h3>
+<p>CHIP-8 dili <code>0x000</code>'dan <code>0xFFF</code>'e kadar 4KB (4096 byte) RAM'e ulaşabilir.
+İlk 512 byte (<code>0x000</code>-<code>0x1FF</code>) yorumlayıcının bulunduğu alandır ve hiç bir
+program bu alanı kullanmamalıdır.</p>
+<p>Çoğu CHIP-8 programı <code>0x200</code> alanından başlar. ETI-660 için olan bazı
+programlar <code>0x600</code>'den başlar fakat bu bir istisna olduğundan görmezden
+geleceğiz.</p>
+<p>Bellek haritası:</p>
+<pre><code class="language-plain">+---------------+= 0xFFF (4095) CHIP-8 RAM'inin sonu
+|               |
+|               |
+|               |
+|               |
+| 0x200 - 0xFFF |
+|    CHIP-8     |
+|  Program ve   |
+|  Veri Alanı   |
+|               |
+|               |
+|               |
++---------------+= 0x200 (512) CHIP-8 programlarının başlangıcı
+| 0x000 - 0x1FF |
+|  Yorumlayıcı  |
+| için ayrılmış |
+|     alan      |
++---------------+= 0x000 (0) CHIP-8 RAM'inin başlangıcı
+</code></pre>
+<h3><a class="header" href="#2-registerlar-yazmaçlar" id="2-registerlar-yazmaçlar">2. Registerlar (Yazmaçlar)</a></h3>
+<p>CHIP-8 8-bit boyutunda 16 tane genel kullanımlı register'a sahiptir. Bu
+registerlar genelde V<em>x</em> olarak adlandırılır (<em>x</em>: 0 dan F'e olmak suretiyle
+16 lık bir sayıdır). Bir tane de 16-bitlik <em>I</em> isimli register vardır. Bu
+register genelde bellek adresini tutmaya yarar ve bu nedenle I registerinin
+sadece en düşük, (sağdan) 12 biti kullanılır.</p>
+<p><em>VF</em> registeri hic bir program tarafından kullanılmamalıdır ve bu register
+bazı instructionların flag değerini saklamak için kullanılır.</p>
+<p>CHIP-8 ayrıca, gecikme ve ses zamanlaması için, iki 8-bit uzunluğunda özel
+kullanımlı register'a sahiptir. Bu registerlar sıfır olmadığı zaman, 60 Hz
+oranında düşürülür.</p>
+<p>Çalışmakta olan adresi tutan; 16-bit boyutunda program sayacı (<em>PC</em>:
+program counter) ve stack'in en üst adresini tutan; 8-bit uzunluğunda stack
+pointer (<em>SP</em>) sözde-registerları da vadır. Bu registerlara hiç bir program
+ulaşamaz.</p>
+<p>Stack 16 tane 16-bitlik değerden oluşur.</p>
+<h3><a class="header" href="#3-klavye" id="3-klavye">3. Klavye</a></h3>
+<p>CHIP-8 dilinin kullanıldığı bilgisayarlar aşagıdaki şemadaki gibi 16 tuşlu
+klavyeye sahiptir:</p>
+<pre><code class="language-plain">+---+---+---+---+
+| 1 | 2 | 3 | C |
+| 4 | 5 | 6 | D |
+| 7 | 8 | 9 | E |
+| A | 0 | B | F |
++---+---+---+---+
+</code></pre>
+<p>Bu klavyenin modern bilgisayarlarda çalışabilmesi için tekrar haritalanması
+gerekmektedir.</p>
+<h3><a class="header" href="#4-görüntü" id="4-görüntü">4. Görüntü</a></h3>
+<p>CHIP-8 dili 64x32 boyutunda, aşağıdaki formata sahip siyah beyaz bir ekrana
+sahiptir:</p>
+<pre><code class="language-plain">+-------------------+
+| (0,0)      (63,0) |
+| (0,31)    (63,31) |
++-------------------+
+</code></pre>
+<p>Programlar 0'dan F'e kadar olmak üzere CHIP-8 belleği üzerinde yer alan
+spriteları da gösterebilir.</p>
+<h3><a class="header" href="#5-zamanlayıcılar-ve-ses" id="5-zamanlayıcılar-ve-ses">5. Zamanlayıcılar ve Ses</a></h3>
+<p>CHIP-8'de 2 tane zamanlayıcı bulunmaktadır: Gecikme ve ses zamanlayıcıları.</p>
+<p>Gecikme zamanlayıcısı 0 olmadığı süre boyunca aktiftir ve her 60Hz yenileme
+sürecinden sonra bir azaltılır.</p>
+<p>Ses zamanlayıcısı da aynı gecikme zamanlayıcısı gibi çalışır. Tek fark
+aktif olduğu süre boyunca CHIP-8 zili öter.</p>
+<h2><a class="header" href="#ayrıntılı-bilgi" id="ayrıntılı-bilgi">Ayrıntılı Bilgi</a></h2>
+<p>CHIP-8 hakkında daha fazla bilgi almak için:
+<a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">Cowgod'un Chip-8 Teknik Referans'ı</a>
+sayfasına göz atabilirsiniz.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="giris.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="baslangic.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="giris.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="baslangic.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

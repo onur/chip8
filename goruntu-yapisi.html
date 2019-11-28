@@ -1,0 +1,389 @@
+<!DOCTYPE HTML>
+<html lang="tr" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Görüntü Yapısı - Rust ile CHIP-8 Emülatörü Geliştirme</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="giris.html">Rust ile CHIP-8 Emülatörü Geliştirme</a></li><li class="expanded affix "><a href="chip-8-hakkinda.html">CHIP-8 Hakkında</a></li><li class="expanded "><a href="baslangic.html"><strong aria-hidden="true">1.</strong> Başlangıç</a></li><li class="expanded "><a href="opcode-yapisi.html"><strong aria-hidden="true">2.</strong> Opcode Yapısı</a></li><li class="expanded "><a href="instruction-yapisi.html"><strong aria-hidden="true">3.</strong> Instruction Yapısı</a></li><li class="expanded "><a href="emulator-yapisi.html"><strong aria-hidden="true">4.</strong> Emülatör Yapısı</a></li><li><ol class="section"><li class="expanded "><a href="rom-okunmasi.html"><strong aria-hidden="true">4.1.</strong> ROM Okunması</a></li><li class="expanded "><a href="instructionlarin-alinmasi.html"><strong aria-hidden="true">4.2.</strong> Instruction'ların Alınması</a></li><li class="expanded "><a href="instructionlarin-calistirilmasi.html"><strong aria-hidden="true">4.3.</strong> Instruction'ların Çalıştırılması</a></li></ol></li><li class="expanded "><a href="goruntu-yapisi.html" class="active"><strong aria-hidden="true">5.</strong> Görüntü Yapısı</a></li><li class="expanded "><a href="klavye-yapisi.html"><strong aria-hidden="true">6.</strong> Klayve Yapısı</a></li><li class="expanded "><a href="emulasyon-dongusu.html"><strong aria-hidden="true">7.</strong> Emülasyon Döngüsü</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Rust ile CHIP-8 Emülatörü Geliştirme</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                            <a href="https://github.com/onur/chip8" title="Git repository" aria-label="Git repository">
+                                <i id="git-repository-button" class="fa fa-github"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#görüntü-yapısı" id="görüntü-yapısı">Görüntü Yapısı</a></h1>
+<p>Emülatörümüzün temel fonksiyonlarını tamamladıktan sonra, ekrana görüntü
+vereceğimiz yapımızın tanımına geçebiliriz. Öncelikle kullanacağımız
+yapıları modülümüze ekleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">use minifb::{Key, Scale, Window, WindowOptions};
+</code></pre>
+<p><a href="https://github.com/emoon/rust_minifb">minifb</a> daha önce de bahsettiğimiz
+gibi en yaygın işletim sistemlerinde bir pencere açıp içerisine bir şeyler
+çizebileceğimiz basit bir paket. Aynı zamanda basılan tuşları da
+alabildiği için bizim için biçilmiş kaftan. Yapıları kullanıma aldıktan
+sonra bazı sabitleri tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">const WIDTH: usize = 64;
+const HEIGHT: usize = 32;
+const FOREGROUND_COLOR: u32 = 0x5294e2;
+const BACKGROUND_COLOR: u32 = 0x282c34;
+</code></pre>
+<p>CHIP-8 64x32 piksel boyutunda bir ekrana sahip. Bu nedenle genişlik (<code>WIDTH</code>)
+ve yükseklik (<code>HEIGHT</code>) olarak iki sabit tanımlaması yaptık. Ayrıca arka
+plan rengi ve ön plan rengi olmak üzere iki 32-bit cinsinden sayı
+tanımladık. minifb 32-bit cinsinden olan değerleri ekrana cizebilir,
+isterseniz burada farklı renkler seçebilirsiniz.</p>
+<p>Rust'ta sabit tanımlamaları <code>const</code> anahtar kelimesiyle yapılır. Tüm
+sabitler <code>'static</code> ömrüne sahiptir.</p>
+<p>Artık görüntü yapımızı tanımlayabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">pub struct Display {
+    buffer: [[u8; WIDTH]; HEIGHT],
+    window: Window,
+}
+</code></pre>
+<p>CHIP-8 siyah beyaz bir ekrana sahip olduğundan görüntü buffer'ı 8-bitlik
+64x32 boyutunda bir matris. Bu buffer içerisinde dolu pikseller için 1, boş
+pikseller için 0 değerini kullanacağız. <code>window</code> alanı için de minifb'nin
+<code>Window</code> tipini kullanıyoruz.</p>
+<h3><a class="header" href="#görüntü-metodlarının-uygulanması" id="görüntü-metodlarının-uygulanması">Görüntü Metodlarının Uygulanması</a></h3>
+<pre><code class="language-rust no_run noplaypen">impl Display {
+}
+</code></pre>
+<p>Bloğunu oluşturarak görüntü metodlarını eklemeye başlayalım.</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn new() -&gt; Self {
+        Self {
+            buffer: [[0; WIDTH]; HEIGHT],
+            window: Window::new(
+                &quot;Rust ile CHIP-8&quot;,
+                WIDTH,
+                HEIGHT,
+                WindowOptions {
+                    scale: Scale::X16,
+                    ..WindowOptions::default()
+                },
+            )
+            .expect(&quot;Pencere oluşturulurken hata oluştu&quot;),
+        }
+    }
+</code></pre>
+<p><code>new</code> metodumuz yeni bir <code>Display</code> instance'ı oluşturmaya yarıyor. Burada
+kullanmış olduğumuz <code>Self</code>; <code>Dislay</code> ile aynı anlama geliyor. İsterseniz
+<code>impl</code> bloğunda tekrar tekrar tip ismini yazmak yerine <code>Self</code> anahtar
+kelimesini kullanabilirsiniz. Unutmayın ki birinci harf büyük olmalı ve bu
+anahtar kelime, metod argümanlarında kullanılan <code>self</code> ile
+karıştırılmamalıdır.</p>
+<p><a href="https://docs.rs/minifb/0.13.0/minifb/struct.WindowOptions.html"><code>WindowOptions</code></a>
+yapısı tamamen açık (public) alanlara sahip bir yapı. Bu nedenle bu yapı
+için herhangi bir yardımcı metod olmadan direkt instance oluşturabiliriz.
+Biz varsayılan (<a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html"><code>Default</code></a>)
+özelliği eklenmiş bu yapının, sadece <code>scale</code> alanını değiştireceğimizden,
+geri kalan alanların varsayılan değeri alması için <code>..WindowOptions::default()</code>
+yazımını kullandık. Rust'ta kullanılan bu yazım, yapının tanımlanmamış
+diğer alanları için varsayılan değerleri almasını sağlıyor. 64x32 piksel
+modern bir bilgisayarda çok küçük olacağı için, <code>scale</code> ile belirlediğimiz
+değerle, minifb paketi görütüyü belirlenen oranda arttırıyor (bizim
+belirlediğimiz X16 oranında).</p>
+<p>Metodumuzda şu an için herhangi bir hata yönetimi yapmadığımızdan dolayı,
+pencere oluşturulurken karşılaşacağımız olası bir hata durumunda <code>expect</code>
+ile panikleyip çıkıyoruz.</p>
+<h3><a class="header" href="#yardımcı-metodlar" id="yardımcı-metodlar">Yardımcı Metodlar</a></h3>
+<pre><code class="language-rust no_run noplaypen">    pub fn is_open(&amp;self) -&gt; bool {
+        self.window.is_open() &amp;&amp; !self.window.is_key_down(Key::Escape)
+    }
+
+    pub fn clear(&amp;mut self) {
+        self.buffer = [[0; WIDTH]; HEIGHT];
+    }
+</code></pre>
+<p><code>is_open</code> metodu adından da anlaşılabileceği gibi, penceremizin açık olup
+olmadığını kontrol ediyor. Aynı zamanda <code>Esc</code> tuşunun basılı olup
+olmadığını da kontrol eden bu metod <code>bool</code> dönüyor. Bu sayede oyuncu
+istediği zaman <code>Esc</code> tuşuna basarak pencereyi kapatabilir ve emülatörü
+sonlandırabilir.</p>
+<p><code>clear</code> metodu, yapımız içerisinde yer alan buffer'ı temizlemeye yarıyor.</p>
+<h3><a class="header" href="#draw-instructionı-ile-Çizim" id="draw-instructionı-ile-Çizim">Draw Instruction'ı ile Çizim</a></h3>
+<p>CHIP-8 draw instruction'ı daha önce belirlediğimiz gibi:</p>
+<pre><code class="language-rust no_run noplaypen">    /// 0xDxyn DRW: `x` ve `y` registerinden başayarak `n` adet byte sprite'ı ekranda
+    /// gösterir. Çakışma (collision) durumu `F` registerinde tutulur.
+    Draw(Register, Register, u8),
+</code></pre>
+<p>Şeklinde yapıyor. Aynı zamanda CHIP-8 sadece bu instruction ile collision
+(spriteların birbiriyle çakışma) durumunu kontrol edebiliyor. Bu işlemi şu
+şekilde yapabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn draw(&amp;mut self, x: usize, y: usize, sprite: &amp;[u8]) -&gt; u8 {
+        let mut collision = 0;
+        let mut xi: usize;
+        let mut yj: usize;
+
+        for (j, sprite) in sprite.iter().enumerate() {
+            for i in 0..8 {
+                xi = (x + i) % WIDTH;
+                yj = (y + j) % HEIGHT;
+
+                if sprite &amp; (0x80 &gt;&gt; i) != 0 {
+                    if self.buffer[yj][xi] == 1 {
+                        collision = 1
+                    }
+                    self.buffer[yj][xi] ^= 1;
+                }
+            }
+        }
+
+        self.draw_screen();
+        collision
+    }
+</code></pre>
+<p><code>sprite</code> bellekten gelen 8-bitlik verilere sahip bir slice. Öncelikle
+for döngümüz her bir sprite için <code>j</code> sayacıyla çalışıyor. Ardından ikinci
+for döngüsünde 8-bitlik verinin her bir bitini kontrol etmeye başlıyoruz.
+<code>xi</code> ve <code>yj</code> ile yazılacak bit'in ekrandaki pozisyonu belirleniyor.
+Ardından her bir bit: <code>0x80: 10000000</code> üzerinde çalıştığımız bit kadar (<code>i</code>)
+sağa kaydırılarak sprite ile XOR işlemi sayesinde herhangi bir çizilecek
+piksel varsa 1, yoksa 0 sonucu elde ediliyor. Ardından daha önce aynı
+pozisyonda herhangi sprite çizildiyse çakışma değeri olan <code>collision</code> 1
+yapılıyor.</p>
+<p>Son olarak CHIP-8'de spritelar ekrana XOR ile çizildiği için, üzerinde
+çalıştığımız piksel 1 ile XOR işlemi ile belirleniyor.</p>
+<h3><a class="header" href="#bufferın-pencereye-Çizimi" id="bufferın-pencereye-Çizimi"><code>buffer</code>'ın Pencereye Çizimi</a></h3>
+<p>minifb <code>&amp;[u32]</code> tipinden bir yapıyı ekrana çizebilir. Bu nedenle
+<code>[[0; WIDTH]; HEIGHT]</code> tipinden olan matrisimizi <code>[u32]</code> tipden bir array'a
+çevirmemiz gerekli. Bu işlemi daha önce sabit olarak belirlediğimiz
+arkaplan ve önplan rengini de kullanarak şu şekilde yapabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn draw_screen(&amp;mut self) {
+        let mut buffer = [0; WIDTH * HEIGHT];
+        let mut loc = 0;
+        for y in 0..HEIGHT {
+            for x in 0..WIDTH {
+                buffer[loc] = if self.buffer[y][x] == 1 {
+                    FOREGROUND_COLOR
+                } else {
+                    BACKGROUND_COLOR
+                };
+                loc += 1;
+            }
+        }
+        self.window.update_with_buffer(&amp;buffer).unwrap();
+    }
+</code></pre>
+<h3><a class="header" href="#referanstan-referansa-dönüştürme-ile-pencere-alanının-alımı" id="referanstan-referansa-dönüştürme-ile-pencere-alanının-alımı">Referanstan-referansa Dönüştürme ile Pencere Alanının Alımı</a></h3>
+<p>İleride yazacağımız emülasyon döngüsü için, <code>Display</code> yapımız içerisinde
+yer alan <code>window</code> alanına ulaşabilmemiz gerekli. Bu işlemi Rust'ın
+referanstan-referansa çevirme işlemi yapan
+<a href="https://doc.rust-lang.org/std/convert/trait.AsMut.html"><code>AsMut</code></a>
+özelliği ile yapacağız. <code>Display</code> yapımıza <code>AsMut</code> özelliğini katalım ve
+<code>as_mut</code> çağrıldığında <code>Window</code> tipini dönelim:</p>
+<pre><code class="language-rust no_run noplaypen">impl AsMut&lt;Window&gt; for Display {
+    fn as_mut(&amp;mut self) -&gt; &amp;mut Window {
+        &amp;mut self.window
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="instructionlarin-calistirilmasi.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="klavye-yapisi.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="instructionlarin-calistirilmasi.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="klavye-yapisi.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

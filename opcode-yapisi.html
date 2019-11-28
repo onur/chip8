@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html lang="tr" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Opcode Yapısı - Rust ile CHIP-8 Emülatörü Geliştirme</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="giris.html">Rust ile CHIP-8 Emülatörü Geliştirme</a></li><li class="expanded affix "><a href="chip-8-hakkinda.html">CHIP-8 Hakkında</a></li><li class="expanded "><a href="baslangic.html"><strong aria-hidden="true">1.</strong> Başlangıç</a></li><li class="expanded "><a href="opcode-yapisi.html" class="active"><strong aria-hidden="true">2.</strong> Opcode Yapısı</a></li><li class="expanded "><a href="instruction-yapisi.html"><strong aria-hidden="true">3.</strong> Instruction Yapısı</a></li><li class="expanded "><a href="emulator-yapisi.html"><strong aria-hidden="true">4.</strong> Emülatör Yapısı</a></li><li><ol class="section"><li class="expanded "><a href="rom-okunmasi.html"><strong aria-hidden="true">4.1.</strong> ROM Okunması</a></li><li class="expanded "><a href="instructionlarin-alinmasi.html"><strong aria-hidden="true">4.2.</strong> Instruction'ların Alınması</a></li><li class="expanded "><a href="instructionlarin-calistirilmasi.html"><strong aria-hidden="true">4.3.</strong> Instruction'ların Çalıştırılması</a></li></ol></li><li class="expanded "><a href="goruntu-yapisi.html"><strong aria-hidden="true">5.</strong> Görüntü Yapısı</a></li><li class="expanded "><a href="klavye-yapisi.html"><strong aria-hidden="true">6.</strong> Klayve Yapısı</a></li><li class="expanded "><a href="emulasyon-dongusu.html"><strong aria-hidden="true">7.</strong> Emülasyon Döngüsü</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Rust ile CHIP-8 Emülatörü Geliştirme</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                            <a href="https://github.com/onur/chip8" title="Git repository" aria-label="Git repository">
+                                <i id="git-repository-button" class="fa fa-github"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#opcode-yapısı" id="opcode-yapısı">Opcode Yapısı</a></h1>
+<p>CHIP-8'in tüm OPCODE'ları 16-bit uzunluğundadır. Bu nedenle çok basit bir
+bir OPCODE yapısı tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">pub struct Opcode(u16);
+</code></pre>
+<p>Rust'ta yapılar <code>struct</code> anahtar kelimesiyle tanımlanır. Struct'lar:</p>
+<ul>
+<li><code>Opcode</code> yapımızda kullandığımız gibi bir isim sahibi tuple olabilir.</li>
+<li>C dilindeki gibi elemanlar içerebilir.</li>
+<li>Hiç bir eleman içermeden unit biçiminde olabilir.</li>
+</ul>
+<p>Biz sadece 16-bitlik bir sayı üzerine eklemeler yapacağımız için, tuple
+cinsinden struct kullanıyoruz.</p>
+<p>Yapımızın başına gelen <code>pub</code> anahtar kelimesi, yapıyı açık hale getirerek
+şu an kullandığımız modül dışında da erişimini mümkün kılmaktadır. <code>pub</code>
+anahtar kelimesi yapılar dışında; enumlar, metodlar, fonksiyonlar ve <code>type</code> ile
+kendi tanımladığınız tipler için de kullanılabilir.</p>
+<p>Rust'ta yer alan primitif tipler (yapımızda kullandığımız
+u16), tek haneli bir önek ardından gelen boyut ile tanımlanır. Yani
+<code>u8</code>: 8-bit boyutunda bir unsigned (sadece pozitif sayıları tutabilen) bir
+sayı tipidir. <code>u16</code> tahmin edilebileceği üzere 16-bit boyutunda bir
+unsigned sayı tipidir. Dilde yer alan diğer primitif tipleri görmek için,
+Rust kitabında yer alan
+<a href="https://doc.rust-lang.org/std/index.html#primitives">primitif tipler</a>
+bölümüne başvurulabilir.</p>
+<p>16-bitlik bu OPCODE'un her bir basamağı (nibble) farklı anlamlara
+gelmektedir. Örneğin: <code>0x71AA</code> OPCODE'u; 1. registerdeki değere <code>0xAA</code>
+sayısını eklemeye yarar. Bu nedenle her bir basamağı alabilmek için, Opcode
+yapımıza yardımcı metodları ekleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">impl Opcode {
+    /// OPCODE üzerinde 0x0X00 değerini döner
+    fn oxoo(&amp;self) -&gt; usize {
+        ((self.0 &amp; 0x0F00) &gt;&gt; 8) as usize
+    }
+
+    /// OPCODE üzerinde 0x00Y0 değerini döner
+    fn ooyo(&amp;self) -&gt; usize {
+        ((self.0 &amp; 0x00F0) &gt;&gt; 4) as usize
+    }
+
+    /// OPCODE üzerinde 0x000N değerini döner
+    fn ooon(&amp;self) -&gt; u8 {
+        (self.0 &amp; 0x000F) as u8
+    }
+
+    /// OPCODE üzerinde 0x00NN değerini döner
+    fn oonn(&amp;self) -&gt; u8 {
+        (self.0 &amp; 0x00FF) as u8
+    }
+
+    /// OPCODE üzerinde 0x0NNN değerini döner
+    fn onnn(&amp;self) -&gt; u16 {
+        self.0 &amp; 0x0FFF
+    }
+}
+</code></pre>
+<p>Rust'ta yapılara eklenecek metodlar <code>impl</code> bloğu içinde yer alır. Aynı
+zamanda metodların ilk parametresi: <code>&amp;self</code> bu fonksiyonların sadece
+oluşturulan bir <code>Opcode</code> instance'ı ile çalışacağını belirtir.</p>
+<p>Methodlar fonksiyonlar gibidir ve <code>fn</code> anahtar kelimesi kullanılarak
+tanımlanır. Parametreler, dönüş değeri ve çağrıldığında çalıştırılacak kod
+bloğuna sahiptirler. Methodların fonksiyonlardan farkı ise, bir yapı
+(struct veya enum) için tanımlanırlar ve ilk parametre o yapıya ait
+instance'a ulaşabileceğimiz <code>self</code> anahtar kelimesidir. Eğer metod
+çalıştırıldığında, instance sahipliğini almak istemiyorsak, <code>self</code>
+parametresi başına <code>&amp;</code> koyularak referans olarak eklenir. Instance'ı referans
+olarak sunmayıp sahipliğini alsaydık, bu metodların kullanımının ardından
+instance sahipliği kaybolacaktı.</p>
+<p>Metod adı ve parametrelerinin ardından döneceği tip <code>-&gt;</code> dan sonra yazılır.</p>
+<p>Yapımız tuple cinsinden bir struct olduğu için, yapı içerisindeki veriye
+aynı tuplelarda olduğu gibi <code>self.0</code> ile ulaşılır.</p>
+<p>Rust'ta primitif tipler (u8, u16 vb.) <code>as</code> anahtar kelimesiyle birbirine
+dönüştürüleblir. Fakat unutmayın ki boyutu büyük bir sayı (<code>u16</code>), <code>as</code> anahtar
+kelimesiyle daha küçük bir sayıya dönüştürülürken hiç bir uyarı vermeden sayıyı
+kırpabilir. Bu nedenle eğer büyük bir sayıyı küçük bir sayıya dönüştürmek
+istiyorsanız <code>u8::from()</code> metodunu kullanın. Biz geliştirdiğimiz uygulamada
+dönüştürülen sayıların 16-bit'ten küçük olduğunu bildiğimiz için <code>as</code> anahtar
+kelimesini kullanacağız.</p>
+<p>Metod isimleri ilk bakışta garip gelebilir fakat, CHIP-8 OPCODE'larında her
+zaman soldan ikinci basamak <code>x</code>: ilk register numarasını, üçüncü basamak
+ise <code>y</code>: ikinci register numarasını içermektedir. İleride array cinsinden
+olan registerlarda daha rahat çalışabilmek için <code>x</code> ve <code>y</code> registerlarını
+dönen <code>oxoo</code>, <code>ooyo</code> metodları <code>usize</code> dönmektedir (Rust'ta array indisleri
+<code>usize</code> cinsinden olmalıdır).</p>
+<p>Yapılan bitwise işlemleri açıklamak gerekirse, tekrar <code>0x71AA</code> örneğini
+ele alalım. <code>0x71AA</code> sayısında ikinci basamakta yer alan <code>1</code> değerini almak
+için öncelikle <code>oxoo</code> metodunu kullanmamız gerekli. Bu metod şu işlemleri
+yapmaktadır:</p>
+<pre><code>0x71AA     111000110101010  XOR
+0x0F00     000111100000000
+0x0100     000000100000000  &gt;&gt; 8
+0x0001     000000000000001  # 16-bit uzunluğundaki sayı, CHIP-8'de sadece 16
+--------------------------  # register bulunduğundan 8-bit'e dönüştürülür:
+0x01              00000001
+</code></pre>
+<p>Ardından <code>0xAA</code> sayısı alınabilmesi için <code>oonn</code> metodu kullanılır:</p>
+<pre><code>0x71AA     111000110101010  XOR
+0x00FF     000000011111111
+0x00AA     000000010101010  # Son iki basamak sadece 8-bit uzunluğunda
+                            # olabileceğinden çıkan sonuç 8-bit'e dönüştürülür
+--------------------------
+0xAA              10101010
+</code></pre>
+<h2><a class="header" href="#sayıların-opcodea-dönüştürülmesi" id="sayıların-opcodea-dönüştürülmesi">Sayıların OPCODE'a Dönüştürülmesi</a></h2>
+<p>İleride işimize yarayacağı için 16-bitlik bir sayının (<code>u16</code>), <code>Opcode</code>
+yapısına kolayca dönüştürülmesini sağlayan
+<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> özelliğini
+eklememiz gerekli. Rust'ta yapılara yeni özellikle şu şekilde eklenir:</p>
+<pre><code class="language-rust no_run noplaypen">impl From&lt;u16&gt; for Opcode {
+    fn from(opcode: u16) -&gt; Opcode {
+        Opcode(opcode)
+    }
+}
+</code></pre>
+<p><code>From</code> özelliği aynı zamanda <code>Into</code> özelliğini de otomatikmen eklediğinden,
+<code>Opcode</code> kullanmamız gereken parametrelerde <code>Into&lt;Opcode&gt;</code> genelleyici tipini
+kullanmamız yeterli olacak. Bu sayede <code>Opcode</code> hem verbose olarak
+<code>Opcode(0xF1AA)</code> hem de <code>into</code> metoduyla direkt bir sayıdan dönüştürülebilir.</p>
+<p>Genelleyiciler (generics) ve özellikler (traits) çok kapsamlı bir konudur ve
+Rust'ın en önemli bileşenlerindendir. Şimdilik kafanızı çok fazla
+karıştırmanıza gerek yok fakat isterseniz Rust kitabında yer alan:
+<a href="https://doc.rust-lang.org/rust-by-example/generics/gen_trait.html">Özellikler</a>
+bölümünü okuyabilirsiniz.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="baslangic.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="instruction-yapisi.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="baslangic.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="instruction-yapisi.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

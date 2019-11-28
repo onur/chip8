@@ -1,0 +1,500 @@
+<!DOCTYPE HTML>
+<html lang="tr" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Instruction Yapısı - Rust ile CHIP-8 Emülatörü Geliştirme</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="giris.html">Rust ile CHIP-8 Emülatörü Geliştirme</a></li><li class="expanded affix "><a href="chip-8-hakkinda.html">CHIP-8 Hakkında</a></li><li class="expanded "><a href="baslangic.html"><strong aria-hidden="true">1.</strong> Başlangıç</a></li><li class="expanded "><a href="opcode-yapisi.html"><strong aria-hidden="true">2.</strong> Opcode Yapısı</a></li><li class="expanded "><a href="instruction-yapisi.html" class="active"><strong aria-hidden="true">3.</strong> Instruction Yapısı</a></li><li class="expanded "><a href="emulator-yapisi.html"><strong aria-hidden="true">4.</strong> Emülatör Yapısı</a></li><li><ol class="section"><li class="expanded "><a href="rom-okunmasi.html"><strong aria-hidden="true">4.1.</strong> ROM Okunması</a></li><li class="expanded "><a href="instructionlarin-alinmasi.html"><strong aria-hidden="true">4.2.</strong> Instruction'ların Alınması</a></li><li class="expanded "><a href="instructionlarin-calistirilmasi.html"><strong aria-hidden="true">4.3.</strong> Instruction'ların Çalıştırılması</a></li></ol></li><li class="expanded "><a href="goruntu-yapisi.html"><strong aria-hidden="true">5.</strong> Görüntü Yapısı</a></li><li class="expanded "><a href="klavye-yapisi.html"><strong aria-hidden="true">6.</strong> Klayve Yapısı</a></li><li class="expanded "><a href="emulasyon-dongusu.html"><strong aria-hidden="true">7.</strong> Emülasyon Döngüsü</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Rust ile CHIP-8 Emülatörü Geliştirme</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                            <a href="https://github.com/onur/chip8" title="Git repository" aria-label="Git repository">
+                                <i id="git-repository-button" class="fa fa-github"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#instuction-yapısı" id="instuction-yapısı">Instuction Yapısı</a></h1>
+<p>Bu bölümde Rust'ta <code>enum</code> cinsinden yeni bir yapı tanımlama şeklini
+göreceğiz. Rust'ta <code>enum</code>'lar farklı biçimlerde yapılar içerebilir. Örneğin
+bir <code>enum</code> içerisinde yer alan yapı: unit benzeri hiç bir eleman içermeyen,
+<code>tuple</code> cinsinden ya da C benzeri bir <code>struct</code> olabilir. Her bir geçerli
+<code>struct</code> yapısı, aynı zamanda geçerli bir <code>enum</code> biçimidir.</p>
+<p>Rust'ın yine en güçlü özelliklerinden biri olan pattern matching, <code>enum</code>
+yapısını kolay bir şekilde parçalayarak işlemeye yarar. Yazacağımız
+emülatörün okunabilir olabilmesi için, 16-bitlik sayı olarak okuduğumuz
+Opcode'u, <code>enum</code> ile okunabilir bir yapıya dönüştüreceğiz.</p>
+<p>Bu işlemi yapmadan önce 16-bit uzunluğunda olan ve bellekte bir adresi
+ifade eden <code>Address</code> tipimizi ve array indislerinde kolayca kullanmamızı
+sağlayan <code>Register</code> tipimizi tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">pub type Address = u16;
+pub type Register = usize;
+</code></pre>
+<p>Rust'ta yeni tipler <code>type</code> anahtar kelimesiyle tanımlanır. Başka bir tipi
+daha okunabilir bir hale getirmeye yarar. Bu sayede artık adres olduğunu
+bildiğimiz alanlar için <code>u16</code> yerine <code>Address</code> tipini kullanabiliriz.</p>
+<p>CHIP-8, 35 instructiona sahip bir yorumlayıcı. Bu OPCODE'ların hepsini bir
+<code>enum</code> içerisinde şu şekilde tanımlayabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">pub enum Instruction {
+    /// 0x00E0 CLS: Ekranı temizler
+    ClearDisplay,
+
+    /// 0x00EE RET: Alt programdan döner
+    Return,
+
+    /// 0x1nnn JP: `nnn` adresine zıplar
+    Jump(Address),
+
+    /// 0x2nnn CALL: `nnn` adresindeki alt programı çağırır
+    Call(Address),
+
+    /// 0x3xnn SE: Eğer `x` registeri `nn`'e eşitse bir sonraki instruction'ı atlar
+    SkipIfEqualsByte(Register, u8),
+
+    /// 0x4xnn SE: Eğer `x` registeri `nn`'e eşit değilse bir sonraki instruction'ı atlar
+    SkipIfNotEqualsByte(Register, u8),
+
+    /// 0x5xy0 SE: Eğer `x` registeri `y` registerine eşitse
+    /// bir sonraki instruction'ı atlar
+    SkipIfEqual(Register, Register),
+
+    /// 0x6xnn LD: `x` registerinin değerini `nn` yapar.
+    LoadByte(Register, u8),
+
+    /// 0x7xnn ADD: `x` registerindeki değere `nn` ekler.
+    AddByte(Register, u8),
+
+    /// 0x8xy0 LD: `x` registerinin değerini `y` registerinin değerine eşitler.
+    Move(Register, Register),
+
+    /// 0x8xy1 OR: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise OR işlemi yapar.
+    Or(Register, Register),
+
+    /// 0x8xy2 AND: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise AND işlemi yapar.
+    And(Register, Register),
+
+    /// 0x8xy3 XOR: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise XOR işlemi yapar.
+    Xor(Register, Register),
+
+    /// 0x8xy4 ADD: `x` registerinin değerini `y` registerinin değeriyle toplar ve `x`
+    /// registerinin değerini sonuca eşitler. Çıkan sonuç 8 bitten fazla ise, `F` (carry)
+    /// registerinin değerini 1 yapar, değilse 0.
+    Add(Register, Register),
+
+    /// 0x8xy5 SUB: `x` registerinin değerini `y` registerinin değerinden çıkarır ve `x`
+    /// registerinin değerini sonuca eşitler. Eğer `x` registerindei değer, `y`
+    /// registerindeki değerden büyükse, `F` (carry) registerinin değerini 1 yapar,
+    /// değilse 0.
+    Sub(Register, Register),
+
+    /// 0x8xy6 SHR: `x` registerindeki değeri bir bit sağa kaydırır.
+    /// Eğer `x` registerinin son biti 1 ise `F` (carry) registerinin değerini 1 yapar
+    /// değilse 0.
+    ShiftRight(Register),
+
+    /// 0x8xy7 SUB: `y` registerinin değerini `x` registerinin değerinden çıkarır ve `x`
+    /// registerinin değerini sonuca eşitler. Eğer `x` registerindei değer, `y`
+    /// registerindeki değerden büyükse, `F` (carry) registerinin değerini 1 yapar,
+    /// değilse 0.
+    ReverseSub(Register, Register),
+
+    /// 0x8xyE SHR: `x` registerindeki değeri bir bit sola kaydırır.
+    /// Eğer `x` registerinin son biti 1 ise `F` (carry) registerinin değerini 1 yapar
+    /// değilse 0.
+    ShiftLeft(Register),
+
+    /// 0x9xy0 SE: Eğer `x` registeri `y` registerine eşit değilse
+    /// bir sonraki instruction'ı atlar
+    SkipIfNotEqual(Register, Register),
+
+    /// 0xAnnn LD: `I` registerinin değerini `nnn` yapar.
+    LoadI(Address),
+
+    /// 0xBnnn JP: `nnn` ve `V0` registerinin toplamından çıkan sonuca zıplar.
+    JumpPlusZero(Address),
+
+    /// 0xCxnn RND: Rastgele üretilen 8 bitlik sayı `nn` ile AND işleminden sonra
+    /// çıkan sonuç `x` registerine atanır.
+    Random(Register, u8),
+
+    /// 0xDxyn DRW: `x` ve `y` registerinden başayarak `n` adet byte sprite'ı ekranda
+    /// gösterir. Çakışma (collision) durumu `F` registerinde tutulur.
+    Draw(Register, Register, u8),
+
+    /// 0xEx9E SKP: `x` registerinde yer alan tuş basılırsa
+    /// bir sonraki instruction'ı atlar
+    SkipIfPressed(Register),
+
+    /// 0xExA1 SKP: `x` registerinde yer alan tuş basılı değilse
+    /// bir sonraki instruction'ı atlar
+    SkipIfNotPressed(Register),
+
+    /// 0xFx07 LD: `x` registerinin değerini delay timer yapar.
+    LoadDelayTimer(Register),
+
+    /// 0xFx0A LD: Bir tuşa basılmasını bekler ve basılan tuşun değerini `x`
+    /// registerine atar. Tuş basılana kadar tüm çalıştırma durur.
+    WaitForKeyPress(Register),
+
+    /// 0xFx15 LD: Delay timer'ı `x` registerindeki değer yapar.
+    SetDelayTimer(Register),
+
+    /// 0xFx18 LD: Sound timer'ı `x` registerindeki değer yapar.
+    SetSoundTimer(Register),
+
+    /// 0xFx1E ADD: `I` registerinin değerini `I` ve `x` registerinin toplamı yapar.
+    AddToI(Register),
+
+    /// 0xFx29 LD: `I` registerinin değerini `x` registerinde yer alan değerden
+    /// gelen sprite yeri yapar.
+    LoadSprite(Register),
+
+    /// 0xFx33 LD: `x` registerinin BCD (Binary Coded Decimal) cinsinden değerini:
+    /// `I`, `I + 1`, `I + 2` alanlarında saklar.
+    BCDRepresentation(Register),
+
+    /// 0xFx55 LD: `I` registerinde yer alan alandan itibaren
+    /// `0` dan `x` registerine kadar olan değerleri belleğe kopyalar.
+    StoreRegisters(Register),
+
+    /// 0xFx65 LD: `I` registerinde yer alan alandan itibaren
+    /// bellekte yer alan değerleri `0` dan `x` registerine kopyalar.
+    LoadRegisters(Register),
+}
+</code></pre>
+<p><code>enum</code> yapımızda içerisinde hiç bir veri tutmayan unit cinsinden ve veri
+barındıran tuple cinsinden bileşenleri görebilirsiniz. <code>enum</code> elemanları
+yukarıda da belirttiğimiz gibi bu iki türden de olabilir.</p>
+<h2><a class="header" href="#opcodeun-instructiona-dönüştürülmesi" id="opcodeun-instructiona-dönüştürülmesi">OPCODE'un Instruction'a Dönüştürülmesi</a></h2>
+<p>Rust'ta <code>struct</code>'lara olduğu gibi, <code>enum</code>'lara da metod ekleyebilirsiniz.
+Elimizde sayı halinde bulunan raw OPCODE'dan yeni bir <code>Instruction</code> instance'ı
+oluşturmak için <code>new</code> metodunu ekleyelim. Rust'ta yeni bir instance
+oluşturan metodlar genelde <code>new</code> ismiyle adlandırılır. Bu bir zorunluluk
+değil, istediğiniz ismi koyabilirsiniz.</p>
+<pre><code class="language-rust no_run noplaypen">impl Instruction {
+    pub fn new&lt;T: Into&lt;Opcode&gt;&gt;(opcode: T) -&gt; Option&lt;Instruction&gt; {
+        let opcode = opcode.into();
+        match opcode.0 &amp; 0xF000 {
+            0x0000 =&gt; match opcode.ooon() {
+                0x0000 =&gt; Some(Instruction::ClearDisplay),
+                0x000E =&gt; Some(Instruction::Return),
+                _ =&gt; None,
+            },
+            0x1000 =&gt; Some(Instruction::Jump(opcode.onnn())),
+            0x2000 =&gt; Some(Instruction::Call(opcode.onnn())),
+            0x3000 =&gt; Some(Instruction::SkipIfEqualsByte(opcode.oxoo(), opcode.oonn())),
+            0x4000 =&gt; Some(Instruction::SkipIfNotEqualsByte(
+                opcode.oxoo(),
+                opcode.oonn(),
+            )),
+            0x5000 =&gt; Some(Instruction::SkipIfEqual(opcode.oxoo(), opcode.ooyo())),
+            0x6000 =&gt; Some(Instruction::LoadByte(opcode.oxoo(), opcode.oonn())),
+            0x7000 =&gt; Some(Instruction::AddByte(opcode.oxoo(), opcode.oonn())),
+            0x8000 =&gt; match opcode.ooon() {
+                0x0000 =&gt; Some(Instruction::Move(opcode.oxoo(), opcode.ooyo())),
+                0x0001 =&gt; Some(Instruction::Or(opcode.oxoo(), opcode.ooyo())),
+                0x0002 =&gt; Some(Instruction::And(opcode.oxoo(), opcode.ooyo())),
+                0x0003 =&gt; Some(Instruction::Xor(opcode.oxoo(), opcode.ooyo())),
+                0x0004 =&gt; Some(Instruction::Add(opcode.oxoo(), opcode.ooyo())),
+                0x0005 =&gt; Some(Instruction::Sub(opcode.oxoo(), opcode.ooyo())),
+                0x0006 =&gt; Some(Instruction::ShiftRight(opcode.oxoo())),
+                0x0007 =&gt; Some(Instruction::ReverseSub(opcode.oxoo(), opcode.ooyo())),
+                0x000E =&gt; Some(Instruction::ShiftLeft(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            0x9000 =&gt; Some(Instruction::SkipIfNotEqual(opcode.oxoo(), opcode.ooyo())),
+            0xA000 =&gt; Some(Instruction::LoadI(opcode.onnn())),
+            0xB000 =&gt; Some(Instruction::JumpPlusZero(opcode.onnn())),
+            0xC000 =&gt; Some(Instruction::Random(opcode.oxoo(), opcode.oonn())),
+            0xD000 =&gt; Some(Instruction::Draw(
+                opcode.oxoo(),
+                opcode.ooyo(),
+                opcode.ooon(),
+            )),
+            0xE000 =&gt; match opcode.oonn() {
+                0x009E =&gt; Some(Instruction::SkipIfPressed(opcode.oxoo())),
+                0x00A1 =&gt; Some(Instruction::SkipIfNotPressed(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            0xF000 =&gt; match opcode.oonn() {
+                0x0007 =&gt; Some(Instruction::LoadDelayTimer(opcode.oxoo())),
+                0x000A =&gt; Some(Instruction::WaitForKeyPress(opcode.oxoo())),
+                0x0015 =&gt; Some(Instruction::SetDelayTimer(opcode.oxoo())),
+                0x0018 =&gt; Some(Instruction::SetSoundTimer(opcode.oxoo())),
+                0x001E =&gt; Some(Instruction::AddToI(opcode.oxoo())),
+                0x0029 =&gt; Some(Instruction::LoadSprite(opcode.oxoo())),
+                0x0033 =&gt; Some(Instruction::BCDRepresentation(opcode.oxoo())),
+                0x0055 =&gt; Some(Instruction::StoreRegisters(opcode.oxoo())),
+                0x0065 =&gt; Some(Instruction::LoadRegisters(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            _ =&gt; None,
+        }
+    }
+}
+</code></pre>
+<p>Bu metodda Rust'a ait bir çok özellik bulunuyor. Öncelikle metod imzamızı
+inceleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn new&lt;T: Into&lt;Opcode&gt;&gt;(opcode: T) -&gt; Option&lt;Instruction&gt; {
+</code></pre>
+<p><code>T</code> tahmin edebileceğiniz gibi bir genelleyici (generic). Genelleyici
+tanımları metod adından sonra <code>&lt;&gt;</code> içerisinde yapılır. Genelleyicimiz
+<code>Into&lt;Opcode&gt;</code> özelliğine sahip bir parametre anlamına gelmektedir.
+Daha önce OPCODE'a
+<a href="opcode-yapisi.html#say%C4%B1lar%C4%B1n-opcodea-d%C3%B6n%C3%BC%C5%9Ft%C3%BCr%C3%BClmesi">eklediğimiz</a>
+<code>From</code> özelliği sayesinde, <code>opcode</code> isiminli parametremiz, <code>Opcode</code>'a
+dönüştürülebilen herhangi bir tip olabilir. Bu sayede bu metodu istersek
+16-bitlik bir sayı olarak da çalıştırabiliriz
+(<code>Instruction::new(0xF155)</code> gibi). Opcode'a eklediğimiz <code>From</code> özelliği,
+sayının otomatikmen <code>Opcode</code> tipine çevrilmesini sağlayacaktır.</p>
+<p>Metodumuz aynı zamanda normal bir <code>Instruction</code> yerine <code>Option&lt;Instruction&gt;</code>
+dönmekte. Rust'ta yer alan
+<a href="https://doc.rust-lang.org/std/option/index.html"><code>Option</code></a> tipi;
+opsiyonel bir değeri temsil etmektedir. Bu tip herhangi bir <code>Some</code>
+ya da hiç bir <code>None</code> değer taşıyabilir. CHIP-8'de sadece 35 OPCODE
+bulunduğundan genen raw OPCODE, <code>Instruction</code> tipine dönüştürülürken
+bilinen OPCODE'lar için <code>Some(Instruction)</code>, bilinmeyenler için
+hiç bir değeri olan <code>None</code> dönüyoruz.</p>
+<p>Metodumuz içerisinde yer alan <code>let opcode = opcode.into();</code> satırı,
+yukarıda bahsettiğimiz genelleyici ile gelen <code>Into&lt;Opcode&gt;</code> özelliğine
+sahip <code>opcode</code> parametresini <code>Opcode</code>'a çevirmeye yarar. Aynı zamanda Rust
+gölgelemeye de izin verdiğinden, <code>opcode</code> değişkeni bu satırdan sonra
+<code>Opcode</code> tipine dönüşür.</p>
+<p>Ardından gelen kod bloğunda raw OPCODE parçalanarak, okunabilir tipimiz
+olan <code>Instruction</code>'a dönüştürülüyor. Bu işlemi yaparken yine Rust'ın yine
+en önemli özelliklerinden biri olan <a href="https://doc.rust-lang.org/book/ch06-02-match.html">pattern
+matching</a> kullanıyoruz.
+<code>match</code> C de yer alan switch-case'e çok benzemesine rağmen, <code>match</code> edilen
+değerin tüm elemanlarını kapsamak zorundadır. Biz bu işlemi yaparken
+16-bitlik bir sayı kullandığımızdan, işimize yarayan tüm değerleri aldık ve
+geri kalan ve işimize yaramayanlar içinde <code>_</code> elemanını kullandık.</p>
+<p><code>match</code> bloğumuz <code>Option&lt;Instruction&gt;</code> döndüğü sürece,
+iç içe istediğimiz kadar <code>match</code> kullanabiliriz. Bu nedenle önce en soldaki
+nibble kontrol edildikten sonra, aynı nibble ile başlayan OPCODE'lar
+tekrar <code>match</code> ile kontrol edildip, OPCODE'a uyan bir <code>Instruction</code>
+tipi oluşturuluyor.</p>
+<p><code>Instruction</code> tipimizi içerisinde veri barındıran (daha önce tanımladığımız
+<code>Address</code>, <code>Register</code> vb.) bileşenler barındırdığından, <code>Instruction</code> tipi
+oluşturulurken bu bileşenlere gerekli değerler atanır. Bu işlemi yaparken
+daha önce <code>Opcode</code> tipine eklediğimiz yardımcı fonksiyonları kullanıyoruz.</p>
+<p>Rust'ta her satır aynı zamanda bir deyim olduğundan ve <code>match</code> bloğumuz da
+aynı zamanda <code>Option&lt;Instruction&gt;</code> döndüğünden, <code>return</code> anahtar kelimesini
+kullanmamıza gerek yok. Deyim olarak kullanılan bu match bloğunun sonunda
+<code>;</code> olmamasına dikkat edin.</p>
+<p>Son olarak Rust'ta yorum satırları <code>//</code> ile başlar. Rust içerisinde çok
+gelişmiş bir belgeleme aracı (rustdoc) da bulundurmaktadır. Herhangi bir
+tanımdan önce (bu bir metod, fonksiyon, struct, bileşen  ya da alan
+olabilir); 3 slash ile (<code>///</code>) oluşturacağınız yorum satırı, belgeleme
+aracı ile oluşturacağınız belgede o alan için tanımlama yapar. Kodlarken
+yazabileceğiniz bu yorum satırları, aynı zamanda herhangi bir Rust
+kütüphanesinin belgelemesini de çok kolay bir hale getirir.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="opcode-yapisi.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="emulator-yapisi.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="opcode-yapisi.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="emulator-yapisi.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

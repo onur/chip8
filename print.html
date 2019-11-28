@@ -1,0 +1,1589 @@
+<!DOCTYPE HTML>
+<html lang="tr" class="sidebar-visible no-js rust">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Rust ile CHIP-8 Emülatörü Geliştirme</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "rust";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="giris.html">Rust ile CHIP-8 Emülatörü Geliştirme</a></li><li class="expanded affix "><a href="chip-8-hakkinda.html">CHIP-8 Hakkında</a></li><li class="expanded "><a href="baslangic.html"><strong aria-hidden="true">1.</strong> Başlangıç</a></li><li class="expanded "><a href="opcode-yapisi.html"><strong aria-hidden="true">2.</strong> Opcode Yapısı</a></li><li class="expanded "><a href="instruction-yapisi.html"><strong aria-hidden="true">3.</strong> Instruction Yapısı</a></li><li class="expanded "><a href="emulator-yapisi.html"><strong aria-hidden="true">4.</strong> Emülatör Yapısı</a></li><li><ol class="section"><li class="expanded "><a href="rom-okunmasi.html"><strong aria-hidden="true">4.1.</strong> ROM Okunması</a></li><li class="expanded "><a href="instructionlarin-alinmasi.html"><strong aria-hidden="true">4.2.</strong> Instruction'ların Alınması</a></li><li class="expanded "><a href="instructionlarin-calistirilmasi.html"><strong aria-hidden="true">4.3.</strong> Instruction'ların Çalıştırılması</a></li></ol></li><li class="expanded "><a href="goruntu-yapisi.html"><strong aria-hidden="true">5.</strong> Görüntü Yapısı</a></li><li class="expanded "><a href="klavye-yapisi.html"><strong aria-hidden="true">6.</strong> Klayve Yapısı</a></li><li class="expanded "><a href="emulasyon-dongusu.html"><strong aria-hidden="true">7.</strong> Emülasyon Döngüsü</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Rust ile CHIP-8 Emülatörü Geliştirme</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                            <a href="https://github.com/onur/chip8" title="Git repository" aria-label="Git repository">
+                                <i id="git-repository-button" class="fa fa-github"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#rust-ile-chip-8-emülatörü-geliştirme" id="rust-ile-chip-8-emülatörü-geliştirme">Rust ile CHIP-8 Emülatörü Geliştirme</a></h1>
+<p>Bu kitap Rust Programlama Dili ve farklı mimariler için emülatör yapımını
+öğrenmek isteyenler için yazılmış eğitici bir belgedir. Yazı programlamayı
+sıfırdan öğretmeyi amaçlamamaktadır ve okuyucuların daha
+önce en az bir programlama dili bildiği varsayılmıştır. Aynı zamanda
+emülatör geliştirirken lazım olan bir çok bitdüzeyi (bitwise) işlem
+kullanılmıştır. Bitdüzeyi işlemler olabildiğince anlaşılır bir dilde
+açıklanmasına rağmen, okuyucuların konu hakkında daha önce bilgili olması
+anlamalarını daha da kolaylaştıracaktır.</p>
+<h2><a class="header" href="#neden-chip-8-emülatörü-yazmalıyım" id="neden-chip-8-emülatörü-yazmalıyım">Neden CHIP-8 Emülatörü Yazmalıyım?</a></h2>
+<p><a href="https://en.wikipedia.org/wiki/CHIP-8">CHIP-8</a> sadece 35 opcode'u bulunan
+çok basit bir sistemdir. Aynı zamanda bir çok opcode modern CPU'larda da
+kullanıldığından bu sistem için geliştirilecek bir emülatör projesi,
+gerekse modern CPU'ların çalışma prensibini ve temelinde bir sistem
+programlama dili olan Rust'ı öğrenmek için en iyi başlangıç
+projelerinden biridir. Yıllardır Rust Programlama Dili'ni öğrenmek
+isteyenlere bir CHIP-8 emülatörü yazarak başlamalarını tavsiye ederim.</p>
+<h2><a class="header" href="#yazar-hakkında" id="yazar-hakkında">Yazar Hakkında</a></h2>
+<p>Rust Programlama Dili'ni stabil sürümü çıkmadan, beta sürecinden beri
+gündelik yaşamımda kullanmaktayım. Rust için belgeleme aracı olan
+<a href="https://docs.rs">Docs.rs</a>'i geliştirdim ve Mozilla'nın Rust Programlama
+Dili organizasyonunda geliştirmesine devam etmekteyim. Bana
+ulaşabileceğiniz kanallar:</p>
+<ul>
+<li>GitHub: <a href="https://github.com/onur">https://github.com/onur</a></li>
+<li>Twitter: <a href="https://twitter.com/oasln">https://twitter.com/oasln</a></li>
+<li>E-posta: <a href="mailto:onur@onur.im">onur@onur.im</a></li>
+</ul>
+<h2><a class="header" href="#kaynak-kodları" id="kaynak-kodları">Kaynak Kodları</a></h2>
+<p>Bu kitapta kullanılan tüm kod örneklerine, projenin çalışabilir halinin
+tamamına ve kitabın kaynak kodlarına GitHub üzerinden erişilebilirsiniz:
+<a href="https://github.com/onur/chip8">https://github.com/onur/chip8</a>. Proje göndereceğiniz her türlü katkıya
+açıktır.</p>
+<h1><a class="header" href="#chip-8-hakkında" id="chip-8-hakkında">CHIP-8 Hakkında</a></h1>
+<p>CHIP-8 1970'lerin sonunda 1980'lerin başında kendi kendine yap (DIY)
+bilgisayar sistemleri için kullanılmış, basit, yorumlanan bir programlama
+dilidir. The COSMAC VIP, DREAM 6800 ve ETI 660 bu bilgisayarlar için birer
+örnektir.</p>
+<p><img src="./images/640px-Space_intercept.png" alt="Telmac" /></p>
+<p><em>Telmac 1800, CHIP-8 oyunu Space Intercept çalıştırıyor.</em></p>
+<p>Bu sayfanın geri kalanı referans niteliğindedir ve ihtiyaç duyulduğunda
+geri dönüp tekrar bakılmak üzere hazırlanmıştır. İsterseniz bu sayfayı
+okumayı geçebilirsiniz, yine de bir göz gezdirmenizde fayda var.</p>
+<h2><a class="header" href="#chip-8-Özellikleri" id="chip-8-Özellikleri">CHIP-8 Özellikleri</a></h2>
+<h3><a class="header" href="#1-bellek" id="1-bellek">1. Bellek</a></h3>
+<p>CHIP-8 dili <code>0x000</code>'dan <code>0xFFF</code>'e kadar 4KB (4096 byte) RAM'e ulaşabilir.
+İlk 512 byte (<code>0x000</code>-<code>0x1FF</code>) yorumlayıcının bulunduğu alandır ve hiç bir
+program bu alanı kullanmamalıdır.</p>
+<p>Çoğu CHIP-8 programı <code>0x200</code> alanından başlar. ETI-660 için olan bazı
+programlar <code>0x600</code>'den başlar fakat bu bir istisna olduğundan görmezden
+geleceğiz.</p>
+<p>Bellek haritası:</p>
+<pre><code class="language-plain">+---------------+= 0xFFF (4095) CHIP-8 RAM'inin sonu
+|               |
+|               |
+|               |
+|               |
+| 0x200 - 0xFFF |
+|    CHIP-8     |
+|  Program ve   |
+|  Veri Alanı   |
+|               |
+|               |
+|               |
++---------------+= 0x200 (512) CHIP-8 programlarının başlangıcı
+| 0x000 - 0x1FF |
+|  Yorumlayıcı  |
+| için ayrılmış |
+|     alan      |
++---------------+= 0x000 (0) CHIP-8 RAM'inin başlangıcı
+</code></pre>
+<h3><a class="header" href="#2-registerlar-yazmaçlar" id="2-registerlar-yazmaçlar">2. Registerlar (Yazmaçlar)</a></h3>
+<p>CHIP-8 8-bit boyutunda 16 tane genel kullanımlı register'a sahiptir. Bu
+registerlar genelde V<em>x</em> olarak adlandırılır (<em>x</em>: 0 dan F'e olmak suretiyle
+16 lık bir sayıdır). Bir tane de 16-bitlik <em>I</em> isimli register vardır. Bu
+register genelde bellek adresini tutmaya yarar ve bu nedenle I registerinin
+sadece en düşük, (sağdan) 12 biti kullanılır.</p>
+<p><em>VF</em> registeri hic bir program tarafından kullanılmamalıdır ve bu register
+bazı instructionların flag değerini saklamak için kullanılır.</p>
+<p>CHIP-8 ayrıca, gecikme ve ses zamanlaması için, iki 8-bit uzunluğunda özel
+kullanımlı register'a sahiptir. Bu registerlar sıfır olmadığı zaman, 60 Hz
+oranında düşürülür.</p>
+<p>Çalışmakta olan adresi tutan; 16-bit boyutunda program sayacı (<em>PC</em>:
+program counter) ve stack'in en üst adresini tutan; 8-bit uzunluğunda stack
+pointer (<em>SP</em>) sözde-registerları da vadır. Bu registerlara hiç bir program
+ulaşamaz.</p>
+<p>Stack 16 tane 16-bitlik değerden oluşur.</p>
+<h3><a class="header" href="#3-klavye" id="3-klavye">3. Klavye</a></h3>
+<p>CHIP-8 dilinin kullanıldığı bilgisayarlar aşagıdaki şemadaki gibi 16 tuşlu
+klavyeye sahiptir:</p>
+<pre><code class="language-plain">+---+---+---+---+
+| 1 | 2 | 3 | C |
+| 4 | 5 | 6 | D |
+| 7 | 8 | 9 | E |
+| A | 0 | B | F |
++---+---+---+---+
+</code></pre>
+<p>Bu klavyenin modern bilgisayarlarda çalışabilmesi için tekrar haritalanması
+gerekmektedir.</p>
+<h3><a class="header" href="#4-görüntü" id="4-görüntü">4. Görüntü</a></h3>
+<p>CHIP-8 dili 64x32 boyutunda, aşağıdaki formata sahip siyah beyaz bir ekrana
+sahiptir:</p>
+<pre><code class="language-plain">+-------------------+
+| (0,0)      (63,0) |
+| (0,31)    (63,31) |
++-------------------+
+</code></pre>
+<p>Programlar 0'dan F'e kadar olmak üzere CHIP-8 belleği üzerinde yer alan
+spriteları da gösterebilir.</p>
+<h3><a class="header" href="#5-zamanlayıcılar-ve-ses" id="5-zamanlayıcılar-ve-ses">5. Zamanlayıcılar ve Ses</a></h3>
+<p>CHIP-8'de 2 tane zamanlayıcı bulunmaktadır: Gecikme ve ses zamanlayıcıları.</p>
+<p>Gecikme zamanlayıcısı 0 olmadığı süre boyunca aktiftir ve her 60Hz yenileme
+sürecinden sonra bir azaltılır.</p>
+<p>Ses zamanlayıcısı da aynı gecikme zamanlayıcısı gibi çalışır. Tek fark
+aktif olduğu süre boyunca CHIP-8 zili öter.</p>
+<h2><a class="header" href="#ayrıntılı-bilgi" id="ayrıntılı-bilgi">Ayrıntılı Bilgi</a></h2>
+<p>CHIP-8 hakkında daha fazla bilgi almak için:
+<a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">Cowgod'un Chip-8 Teknik Referans'ı</a>
+sayfasına göz atabilirsiniz.</p>
+<h1><a class="header" href="#başlangıç" id="başlangıç">Başlangıç</a></h1>
+<p>Projeye başlamadan önce Rust Programlama Dili derleyicisinin
+bilgisayarınızda kurulu olması gerekmektedir. Rust derleyicisini işletim
+sisteminize göre <a href="https://www.rust-lang.org/tools/install">Rust kurulumu</a>
+sayfasında anlatıldığı gibi kurabilirsiniz. Bu kurulum bilgisayarınıza Rust
+Programlama Dili derleyicisi <code>rustc</code> ve paket yöneticisi <code>cargo</code>'yu
+kuracaktır. Cargo, Rust paketlerinin bağımlılığı çözüp, indirip derlemeye
+yarayan bir araçtır.</p>
+<h2><a class="header" href="#yeni-proje-oluşturması" id="yeni-proje-oluşturması">Yeni Proje Oluşturması</a></h2>
+<p>Cargo aynı zamanda yeni bir proje oluşturmanızı da sağlar. Yeni bir Rust
+projesi oluşturmak için komut satırından aşağıdaki komutları kullanın:</p>
+<pre><code class="language-sh">$ cargo new chip8
+$ cd chip8
+</code></pre>
+<p>İkinci satırdaki komut, çalışma dizinimizi yeni projemizin içerisinde
+almaktadır. Bu adımdan sonra <code>cargo build</code> ile projenizi derleyebilir,
+<code>cargo run</code> ile çalıştırabilirsiniz. Yeni oluşturduğumuz projemizde <code>cargo run</code> komutunu kullandığımızda karşımıza <code>Hello, world!</code> yazısı çıkacaktır:</p>
+<pre><code class="language-plain">$ cargo run
+   Compiling chip8 v0.1.0 (/home/onur/chip8)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.42s
+     Running `target/debug/chip8`
+Hello, world!
+</code></pre>
+<p>Rust paketlerinin meta verisi <code>Cargo.toml</code> içerisinde tutulmaktadır. Bu
+dosya içinde bağımlılıkları tanımlayabilirsiniz. Şu an için bizim bu dosya
+üzerinde yapacağımız bir değişiklik yok, yine de ön bilgi edinmek için bu
+dosyayı inceleyebilirsiniz. Cargo hakkında daha fazla bilgi almak için
+<a href="https://doc.rust-lang.org/cargo/">Cargo kitabını</a> okuyabilirsiniz.</p>
+<p>Rust Programlama Dili'nde her bir proje aynı zamanda bir pakettir. Bir
+paket; kütüphane veya çalıştırılabilir bir program olabilir. Eğer
+paketinizin kaynak dizini (src) içerisinde <code>main.rs</code> bulunursa, paketiniz
+çalıştırılabilir bir program olarak derlenir. <code>cargo new</code> ile oluşturulan
+bir paket, varsayılan olarak çalıştırılabilir bir program olarak
+oluşturulur. <code>main.rs</code> yerine <code>lib.rs</code> kullanan bir paket, kütüphane olarak
+tasarlanmıştır. Kütüphaneler aynı zamanda çalıştırılabilir programlarda
+barındırabilir. Biz bu projede çalıştırılabilir bir program yapacağımızdan,
+Cargo'nun oluşturduğu <code>main.rs</code>'e sadık kalacağız.</p>
+<h2><a class="header" href="#bağımlılıkların-eklenmesi" id="bağımlılıkların-eklenmesi">Bağımlılıkların Eklenmesi</a></h2>
+<p>Rust'ta paket bağımlılıkları <code>Cargo.toml</code> dosyası içerisinde <code>[dependencies]</code>
+bölümüne eklenir. Bu bölüme eklenen bağımlılıkları cargo, otomatikmen Rust
+paket deposu olan <a href="https://crates.io">crates.io</a> dan indirir derler ve
+uygulamızla birleştirir. Biz uygulamamızda sadece iki tane bağımlılık
+kullanacağız. Bunları <code>[dependencies]</code> bölümüne ekleyelim:</p>
+<pre><code class="language-plain">[dependencies]
+rand = &quot;0.7&quot;
+minifb = &quot;0.13&quot;
+</code></pre>
+<p><code>rand</code> paketi rastgele bir sayı üretmeye yarar, <code>minifb</code> paketi en yaygın
+işletim sistemlerinde (Windows, OSX ve Linux) basit bir şekilde pencere
+oluşturup cizim yapmaya yarar.</p>
+<p>Biz projemizde Rust 2018 yayınını kullandığımızdan, paketimiz içine tekrar
+<code>extern crate</code> tanımlaması yapmamıza gerek yok.</p>
+<h1><a class="header" href="#opcode-yapısı" id="opcode-yapısı">Opcode Yapısı</a></h1>
+<p>CHIP-8'in tüm OPCODE'ları 16-bit uzunluğundadır. Bu nedenle çok basit bir
+bir OPCODE yapısı tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">pub struct Opcode(u16);
+</code></pre>
+<p>Rust'ta yapılar <code>struct</code> anahtar kelimesiyle tanımlanır. Struct'lar:</p>
+<ul>
+<li><code>Opcode</code> yapımızda kullandığımız gibi bir isim sahibi tuple olabilir.</li>
+<li>C dilindeki gibi elemanlar içerebilir.</li>
+<li>Hiç bir eleman içermeden unit biçiminde olabilir.</li>
+</ul>
+<p>Biz sadece 16-bitlik bir sayı üzerine eklemeler yapacağımız için, tuple
+cinsinden struct kullanıyoruz.</p>
+<p>Yapımızın başına gelen <code>pub</code> anahtar kelimesi, yapıyı açık hale getirerek
+şu an kullandığımız modül dışında da erişimini mümkün kılmaktadır. <code>pub</code>
+anahtar kelimesi yapılar dışında; enumlar, metodlar, fonksiyonlar ve <code>type</code> ile
+kendi tanımladığınız tipler için de kullanılabilir.</p>
+<p>Rust'ta yer alan primitif tipler (yapımızda kullandığımız
+u16), tek haneli bir önek ardından gelen boyut ile tanımlanır. Yani
+<code>u8</code>: 8-bit boyutunda bir unsigned (sadece pozitif sayıları tutabilen) bir
+sayı tipidir. <code>u16</code> tahmin edilebileceği üzere 16-bit boyutunda bir
+unsigned sayı tipidir. Dilde yer alan diğer primitif tipleri görmek için,
+Rust kitabında yer alan
+<a href="https://doc.rust-lang.org/std/index.html#primitives">primitif tipler</a>
+bölümüne başvurulabilir.</p>
+<p>16-bitlik bu OPCODE'un her bir basamağı (nibble) farklı anlamlara
+gelmektedir. Örneğin: <code>0x71AA</code> OPCODE'u; 1. registerdeki değere <code>0xAA</code>
+sayısını eklemeye yarar. Bu nedenle her bir basamağı alabilmek için, Opcode
+yapımıza yardımcı metodları ekleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">impl Opcode {
+    /// OPCODE üzerinde 0x0X00 değerini döner
+    fn oxoo(&amp;self) -&gt; usize {
+        ((self.0 &amp; 0x0F00) &gt;&gt; 8) as usize
+    }
+
+    /// OPCODE üzerinde 0x00Y0 değerini döner
+    fn ooyo(&amp;self) -&gt; usize {
+        ((self.0 &amp; 0x00F0) &gt;&gt; 4) as usize
+    }
+
+    /// OPCODE üzerinde 0x000N değerini döner
+    fn ooon(&amp;self) -&gt; u8 {
+        (self.0 &amp; 0x000F) as u8
+    }
+
+    /// OPCODE üzerinde 0x00NN değerini döner
+    fn oonn(&amp;self) -&gt; u8 {
+        (self.0 &amp; 0x00FF) as u8
+    }
+
+    /// OPCODE üzerinde 0x0NNN değerini döner
+    fn onnn(&amp;self) -&gt; u16 {
+        self.0 &amp; 0x0FFF
+    }
+}
+</code></pre>
+<p>Rust'ta yapılara eklenecek metodlar <code>impl</code> bloğu içinde yer alır. Aynı
+zamanda metodların ilk parametresi: <code>&amp;self</code> bu fonksiyonların sadece
+oluşturulan bir <code>Opcode</code> instance'ı ile çalışacağını belirtir.</p>
+<p>Methodlar fonksiyonlar gibidir ve <code>fn</code> anahtar kelimesi kullanılarak
+tanımlanır. Parametreler, dönüş değeri ve çağrıldığında çalıştırılacak kod
+bloğuna sahiptirler. Methodların fonksiyonlardan farkı ise, bir yapı
+(struct veya enum) için tanımlanırlar ve ilk parametre o yapıya ait
+instance'a ulaşabileceğimiz <code>self</code> anahtar kelimesidir. Eğer metod
+çalıştırıldığında, instance sahipliğini almak istemiyorsak, <code>self</code>
+parametresi başına <code>&amp;</code> koyularak referans olarak eklenir. Instance'ı referans
+olarak sunmayıp sahipliğini alsaydık, bu metodların kullanımının ardından
+instance sahipliği kaybolacaktı.</p>
+<p>Metod adı ve parametrelerinin ardından döneceği tip <code>-&gt;</code> dan sonra yazılır.</p>
+<p>Yapımız tuple cinsinden bir struct olduğu için, yapı içerisindeki veriye
+aynı tuplelarda olduğu gibi <code>self.0</code> ile ulaşılır.</p>
+<p>Rust'ta primitif tipler (u8, u16 vb.) <code>as</code> anahtar kelimesiyle birbirine
+dönüştürüleblir. Fakat unutmayın ki boyutu büyük bir sayı (<code>u16</code>), <code>as</code> anahtar
+kelimesiyle daha küçük bir sayıya dönüştürülürken hiç bir uyarı vermeden sayıyı
+kırpabilir. Bu nedenle eğer büyük bir sayıyı küçük bir sayıya dönüştürmek
+istiyorsanız <code>u8::from()</code> metodunu kullanın. Biz geliştirdiğimiz uygulamada
+dönüştürülen sayıların 16-bit'ten küçük olduğunu bildiğimiz için <code>as</code> anahtar
+kelimesini kullanacağız.</p>
+<p>Metod isimleri ilk bakışta garip gelebilir fakat, CHIP-8 OPCODE'larında her
+zaman soldan ikinci basamak <code>x</code>: ilk register numarasını, üçüncü basamak
+ise <code>y</code>: ikinci register numarasını içermektedir. İleride array cinsinden
+olan registerlarda daha rahat çalışabilmek için <code>x</code> ve <code>y</code> registerlarını
+dönen <code>oxoo</code>, <code>ooyo</code> metodları <code>usize</code> dönmektedir (Rust'ta array indisleri
+<code>usize</code> cinsinden olmalıdır).</p>
+<p>Yapılan bitwise işlemleri açıklamak gerekirse, tekrar <code>0x71AA</code> örneğini
+ele alalım. <code>0x71AA</code> sayısında ikinci basamakta yer alan <code>1</code> değerini almak
+için öncelikle <code>oxoo</code> metodunu kullanmamız gerekli. Bu metod şu işlemleri
+yapmaktadır:</p>
+<pre><code>0x71AA     111000110101010  XOR
+0x0F00     000111100000000
+0x0100     000000100000000  &gt;&gt; 8
+0x0001     000000000000001  # 16-bit uzunluğundaki sayı, CHIP-8'de sadece 16
+--------------------------  # register bulunduğundan 8-bit'e dönüştürülür:
+0x01              00000001
+</code></pre>
+<p>Ardından <code>0xAA</code> sayısı alınabilmesi için <code>oonn</code> metodu kullanılır:</p>
+<pre><code>0x71AA     111000110101010  XOR
+0x00FF     000000011111111
+0x00AA     000000010101010  # Son iki basamak sadece 8-bit uzunluğunda
+                            # olabileceğinden çıkan sonuç 8-bit'e dönüştürülür
+--------------------------
+0xAA              10101010
+</code></pre>
+<h2><a class="header" href="#sayıların-opcodea-dönüştürülmesi" id="sayıların-opcodea-dönüştürülmesi">Sayıların OPCODE'a Dönüştürülmesi</a></h2>
+<p>İleride işimize yarayacağı için 16-bitlik bir sayının (<code>u16</code>), <code>Opcode</code>
+yapısına kolayca dönüştürülmesini sağlayan
+<a href="https://doc.rust-lang.org/std/convert/trait.From.html"><code>From</code></a> özelliğini
+eklememiz gerekli. Rust'ta yapılara yeni özellikle şu şekilde eklenir:</p>
+<pre><code class="language-rust no_run noplaypen">impl From&lt;u16&gt; for Opcode {
+    fn from(opcode: u16) -&gt; Opcode {
+        Opcode(opcode)
+    }
+}
+</code></pre>
+<p><code>From</code> özelliği aynı zamanda <code>Into</code> özelliğini de otomatikmen eklediğinden,
+<code>Opcode</code> kullanmamız gereken parametrelerde <code>Into&lt;Opcode&gt;</code> genelleyici tipini
+kullanmamız yeterli olacak. Bu sayede <code>Opcode</code> hem verbose olarak
+<code>Opcode(0xF1AA)</code> hem de <code>into</code> metoduyla direkt bir sayıdan dönüştürülebilir.</p>
+<p>Genelleyiciler (generics) ve özellikler (traits) çok kapsamlı bir konudur ve
+Rust'ın en önemli bileşenlerindendir. Şimdilik kafanızı çok fazla
+karıştırmanıza gerek yok fakat isterseniz Rust kitabında yer alan:
+<a href="https://doc.rust-lang.org/rust-by-example/generics/gen_trait.html">Özellikler</a>
+bölümünü okuyabilirsiniz.</p>
+<h1><a class="header" href="#instuction-yapısı" id="instuction-yapısı">Instuction Yapısı</a></h1>
+<p>Bu bölümde Rust'ta <code>enum</code> cinsinden yeni bir yapı tanımlama şeklini
+göreceğiz. Rust'ta <code>enum</code>'lar farklı biçimlerde yapılar içerebilir. Örneğin
+bir <code>enum</code> içerisinde yer alan yapı: unit benzeri hiç bir eleman içermeyen,
+<code>tuple</code> cinsinden ya da C benzeri bir <code>struct</code> olabilir. Her bir geçerli
+<code>struct</code> yapısı, aynı zamanda geçerli bir <code>enum</code> biçimidir.</p>
+<p>Rust'ın yine en güçlü özelliklerinden biri olan pattern matching, <code>enum</code>
+yapısını kolay bir şekilde parçalayarak işlemeye yarar. Yazacağımız
+emülatörün okunabilir olabilmesi için, 16-bitlik sayı olarak okuduğumuz
+Opcode'u, <code>enum</code> ile okunabilir bir yapıya dönüştüreceğiz.</p>
+<p>Bu işlemi yapmadan önce 16-bit uzunluğunda olan ve bellekte bir adresi
+ifade eden <code>Address</code> tipimizi ve array indislerinde kolayca kullanmamızı
+sağlayan <code>Register</code> tipimizi tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">pub type Address = u16;
+pub type Register = usize;
+</code></pre>
+<p>Rust'ta yeni tipler <code>type</code> anahtar kelimesiyle tanımlanır. Başka bir tipi
+daha okunabilir bir hale getirmeye yarar. Bu sayede artık adres olduğunu
+bildiğimiz alanlar için <code>u16</code> yerine <code>Address</code> tipini kullanabiliriz.</p>
+<p>CHIP-8, 35 instructiona sahip bir yorumlayıcı. Bu OPCODE'ların hepsini bir
+<code>enum</code> içerisinde şu şekilde tanımlayabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">pub enum Instruction {
+    /// 0x00E0 CLS: Ekranı temizler
+    ClearDisplay,
+
+    /// 0x00EE RET: Alt programdan döner
+    Return,
+
+    /// 0x1nnn JP: `nnn` adresine zıplar
+    Jump(Address),
+
+    /// 0x2nnn CALL: `nnn` adresindeki alt programı çağırır
+    Call(Address),
+
+    /// 0x3xnn SE: Eğer `x` registeri `nn`'e eşitse bir sonraki instruction'ı atlar
+    SkipIfEqualsByte(Register, u8),
+
+    /// 0x4xnn SE: Eğer `x` registeri `nn`'e eşit değilse bir sonraki instruction'ı atlar
+    SkipIfNotEqualsByte(Register, u8),
+
+    /// 0x5xy0 SE: Eğer `x` registeri `y` registerine eşitse
+    /// bir sonraki instruction'ı atlar
+    SkipIfEqual(Register, Register),
+
+    /// 0x6xnn LD: `x` registerinin değerini `nn` yapar.
+    LoadByte(Register, u8),
+
+    /// 0x7xnn ADD: `x` registerindeki değere `nn` ekler.
+    AddByte(Register, u8),
+
+    /// 0x8xy0 LD: `x` registerinin değerini `y` registerinin değerine eşitler.
+    Move(Register, Register),
+
+    /// 0x8xy1 OR: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise OR işlemi yapar.
+    Or(Register, Register),
+
+    /// 0x8xy2 AND: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise AND işlemi yapar.
+    And(Register, Register),
+
+    /// 0x8xy3 XOR: `x` registerinin değerini `y` registerinin değeriyle
+    /// bitwise XOR işlemi yapar.
+    Xor(Register, Register),
+
+    /// 0x8xy4 ADD: `x` registerinin değerini `y` registerinin değeriyle toplar ve `x`
+    /// registerinin değerini sonuca eşitler. Çıkan sonuç 8 bitten fazla ise, `F` (carry)
+    /// registerinin değerini 1 yapar, değilse 0.
+    Add(Register, Register),
+
+    /// 0x8xy5 SUB: `x` registerinin değerini `y` registerinin değerinden çıkarır ve `x`
+    /// registerinin değerini sonuca eşitler. Eğer `x` registerindei değer, `y`
+    /// registerindeki değerden büyükse, `F` (carry) registerinin değerini 1 yapar,
+    /// değilse 0.
+    Sub(Register, Register),
+
+    /// 0x8xy6 SHR: `x` registerindeki değeri bir bit sağa kaydırır.
+    /// Eğer `x` registerinin son biti 1 ise `F` (carry) registerinin değerini 1 yapar
+    /// değilse 0.
+    ShiftRight(Register),
+
+    /// 0x8xy7 SUB: `y` registerinin değerini `x` registerinin değerinden çıkarır ve `x`
+    /// registerinin değerini sonuca eşitler. Eğer `x` registerindei değer, `y`
+    /// registerindeki değerden büyükse, `F` (carry) registerinin değerini 1 yapar,
+    /// değilse 0.
+    ReverseSub(Register, Register),
+
+    /// 0x8xyE SHR: `x` registerindeki değeri bir bit sola kaydırır.
+    /// Eğer `x` registerinin son biti 1 ise `F` (carry) registerinin değerini 1 yapar
+    /// değilse 0.
+    ShiftLeft(Register),
+
+    /// 0x9xy0 SE: Eğer `x` registeri `y` registerine eşit değilse
+    /// bir sonraki instruction'ı atlar
+    SkipIfNotEqual(Register, Register),
+
+    /// 0xAnnn LD: `I` registerinin değerini `nnn` yapar.
+    LoadI(Address),
+
+    /// 0xBnnn JP: `nnn` ve `V0` registerinin toplamından çıkan sonuca zıplar.
+    JumpPlusZero(Address),
+
+    /// 0xCxnn RND: Rastgele üretilen 8 bitlik sayı `nn` ile AND işleminden sonra
+    /// çıkan sonuç `x` registerine atanır.
+    Random(Register, u8),
+
+    /// 0xDxyn DRW: `x` ve `y` registerinden başayarak `n` adet byte sprite'ı ekranda
+    /// gösterir. Çakışma (collision) durumu `F` registerinde tutulur.
+    Draw(Register, Register, u8),
+
+    /// 0xEx9E SKP: `x` registerinde yer alan tuş basılırsa
+    /// bir sonraki instruction'ı atlar
+    SkipIfPressed(Register),
+
+    /// 0xExA1 SKP: `x` registerinde yer alan tuş basılı değilse
+    /// bir sonraki instruction'ı atlar
+    SkipIfNotPressed(Register),
+
+    /// 0xFx07 LD: `x` registerinin değerini delay timer yapar.
+    LoadDelayTimer(Register),
+
+    /// 0xFx0A LD: Bir tuşa basılmasını bekler ve basılan tuşun değerini `x`
+    /// registerine atar. Tuş basılana kadar tüm çalıştırma durur.
+    WaitForKeyPress(Register),
+
+    /// 0xFx15 LD: Delay timer'ı `x` registerindeki değer yapar.
+    SetDelayTimer(Register),
+
+    /// 0xFx18 LD: Sound timer'ı `x` registerindeki değer yapar.
+    SetSoundTimer(Register),
+
+    /// 0xFx1E ADD: `I` registerinin değerini `I` ve `x` registerinin toplamı yapar.
+    AddToI(Register),
+
+    /// 0xFx29 LD: `I` registerinin değerini `x` registerinde yer alan değerden
+    /// gelen sprite yeri yapar.
+    LoadSprite(Register),
+
+    /// 0xFx33 LD: `x` registerinin BCD (Binary Coded Decimal) cinsinden değerini:
+    /// `I`, `I + 1`, `I + 2` alanlarında saklar.
+    BCDRepresentation(Register),
+
+    /// 0xFx55 LD: `I` registerinde yer alan alandan itibaren
+    /// `0` dan `x` registerine kadar olan değerleri belleğe kopyalar.
+    StoreRegisters(Register),
+
+    /// 0xFx65 LD: `I` registerinde yer alan alandan itibaren
+    /// bellekte yer alan değerleri `0` dan `x` registerine kopyalar.
+    LoadRegisters(Register),
+}
+</code></pre>
+<p><code>enum</code> yapımızda içerisinde hiç bir veri tutmayan unit cinsinden ve veri
+barındıran tuple cinsinden bileşenleri görebilirsiniz. <code>enum</code> elemanları
+yukarıda da belirttiğimiz gibi bu iki türden de olabilir.</p>
+<h2><a class="header" href="#opcodeun-instructiona-dönüştürülmesi" id="opcodeun-instructiona-dönüştürülmesi">OPCODE'un Instruction'a Dönüştürülmesi</a></h2>
+<p>Rust'ta <code>struct</code>'lara olduğu gibi, <code>enum</code>'lara da metod ekleyebilirsiniz.
+Elimizde sayı halinde bulunan raw OPCODE'dan yeni bir <code>Instruction</code> instance'ı
+oluşturmak için <code>new</code> metodunu ekleyelim. Rust'ta yeni bir instance
+oluşturan metodlar genelde <code>new</code> ismiyle adlandırılır. Bu bir zorunluluk
+değil, istediğiniz ismi koyabilirsiniz.</p>
+<pre><code class="language-rust no_run noplaypen">impl Instruction {
+    pub fn new&lt;T: Into&lt;Opcode&gt;&gt;(opcode: T) -&gt; Option&lt;Instruction&gt; {
+        let opcode = opcode.into();
+        match opcode.0 &amp; 0xF000 {
+            0x0000 =&gt; match opcode.ooon() {
+                0x0000 =&gt; Some(Instruction::ClearDisplay),
+                0x000E =&gt; Some(Instruction::Return),
+                _ =&gt; None,
+            },
+            0x1000 =&gt; Some(Instruction::Jump(opcode.onnn())),
+            0x2000 =&gt; Some(Instruction::Call(opcode.onnn())),
+            0x3000 =&gt; Some(Instruction::SkipIfEqualsByte(opcode.oxoo(), opcode.oonn())),
+            0x4000 =&gt; Some(Instruction::SkipIfNotEqualsByte(
+                opcode.oxoo(),
+                opcode.oonn(),
+            )),
+            0x5000 =&gt; Some(Instruction::SkipIfEqual(opcode.oxoo(), opcode.ooyo())),
+            0x6000 =&gt; Some(Instruction::LoadByte(opcode.oxoo(), opcode.oonn())),
+            0x7000 =&gt; Some(Instruction::AddByte(opcode.oxoo(), opcode.oonn())),
+            0x8000 =&gt; match opcode.ooon() {
+                0x0000 =&gt; Some(Instruction::Move(opcode.oxoo(), opcode.ooyo())),
+                0x0001 =&gt; Some(Instruction::Or(opcode.oxoo(), opcode.ooyo())),
+                0x0002 =&gt; Some(Instruction::And(opcode.oxoo(), opcode.ooyo())),
+                0x0003 =&gt; Some(Instruction::Xor(opcode.oxoo(), opcode.ooyo())),
+                0x0004 =&gt; Some(Instruction::Add(opcode.oxoo(), opcode.ooyo())),
+                0x0005 =&gt; Some(Instruction::Sub(opcode.oxoo(), opcode.ooyo())),
+                0x0006 =&gt; Some(Instruction::ShiftRight(opcode.oxoo())),
+                0x0007 =&gt; Some(Instruction::ReverseSub(opcode.oxoo(), opcode.ooyo())),
+                0x000E =&gt; Some(Instruction::ShiftLeft(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            0x9000 =&gt; Some(Instruction::SkipIfNotEqual(opcode.oxoo(), opcode.ooyo())),
+            0xA000 =&gt; Some(Instruction::LoadI(opcode.onnn())),
+            0xB000 =&gt; Some(Instruction::JumpPlusZero(opcode.onnn())),
+            0xC000 =&gt; Some(Instruction::Random(opcode.oxoo(), opcode.oonn())),
+            0xD000 =&gt; Some(Instruction::Draw(
+                opcode.oxoo(),
+                opcode.ooyo(),
+                opcode.ooon(),
+            )),
+            0xE000 =&gt; match opcode.oonn() {
+                0x009E =&gt; Some(Instruction::SkipIfPressed(opcode.oxoo())),
+                0x00A1 =&gt; Some(Instruction::SkipIfNotPressed(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            0xF000 =&gt; match opcode.oonn() {
+                0x0007 =&gt; Some(Instruction::LoadDelayTimer(opcode.oxoo())),
+                0x000A =&gt; Some(Instruction::WaitForKeyPress(opcode.oxoo())),
+                0x0015 =&gt; Some(Instruction::SetDelayTimer(opcode.oxoo())),
+                0x0018 =&gt; Some(Instruction::SetSoundTimer(opcode.oxoo())),
+                0x001E =&gt; Some(Instruction::AddToI(opcode.oxoo())),
+                0x0029 =&gt; Some(Instruction::LoadSprite(opcode.oxoo())),
+                0x0033 =&gt; Some(Instruction::BCDRepresentation(opcode.oxoo())),
+                0x0055 =&gt; Some(Instruction::StoreRegisters(opcode.oxoo())),
+                0x0065 =&gt; Some(Instruction::LoadRegisters(opcode.oxoo())),
+                _ =&gt; None,
+            },
+            _ =&gt; None,
+        }
+    }
+}
+</code></pre>
+<p>Bu metodda Rust'a ait bir çok özellik bulunuyor. Öncelikle metod imzamızı
+inceleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn new&lt;T: Into&lt;Opcode&gt;&gt;(opcode: T) -&gt; Option&lt;Instruction&gt; {
+</code></pre>
+<p><code>T</code> tahmin edebileceğiniz gibi bir genelleyici (generic). Genelleyici
+tanımları metod adından sonra <code>&lt;&gt;</code> içerisinde yapılır. Genelleyicimiz
+<code>Into&lt;Opcode&gt;</code> özelliğine sahip bir parametre anlamına gelmektedir.
+Daha önce OPCODE'a
+<a href="opcode-yapisi.html#say%C4%B1lar%C4%B1n-opcodea-d%C3%B6n%C3%BC%C5%9Ft%C3%BCr%C3%BClmesi">eklediğimiz</a>
+<code>From</code> özelliği sayesinde, <code>opcode</code> isiminli parametremiz, <code>Opcode</code>'a
+dönüştürülebilen herhangi bir tip olabilir. Bu sayede bu metodu istersek
+16-bitlik bir sayı olarak da çalıştırabiliriz
+(<code>Instruction::new(0xF155)</code> gibi). Opcode'a eklediğimiz <code>From</code> özelliği,
+sayının otomatikmen <code>Opcode</code> tipine çevrilmesini sağlayacaktır.</p>
+<p>Metodumuz aynı zamanda normal bir <code>Instruction</code> yerine <code>Option&lt;Instruction&gt;</code>
+dönmekte. Rust'ta yer alan
+<a href="https://doc.rust-lang.org/std/option/index.html"><code>Option</code></a> tipi;
+opsiyonel bir değeri temsil etmektedir. Bu tip herhangi bir <code>Some</code>
+ya da hiç bir <code>None</code> değer taşıyabilir. CHIP-8'de sadece 35 OPCODE
+bulunduğundan genen raw OPCODE, <code>Instruction</code> tipine dönüştürülürken
+bilinen OPCODE'lar için <code>Some(Instruction)</code>, bilinmeyenler için
+hiç bir değeri olan <code>None</code> dönüyoruz.</p>
+<p>Metodumuz içerisinde yer alan <code>let opcode = opcode.into();</code> satırı,
+yukarıda bahsettiğimiz genelleyici ile gelen <code>Into&lt;Opcode&gt;</code> özelliğine
+sahip <code>opcode</code> parametresini <code>Opcode</code>'a çevirmeye yarar. Aynı zamanda Rust
+gölgelemeye de izin verdiğinden, <code>opcode</code> değişkeni bu satırdan sonra
+<code>Opcode</code> tipine dönüşür.</p>
+<p>Ardından gelen kod bloğunda raw OPCODE parçalanarak, okunabilir tipimiz
+olan <code>Instruction</code>'a dönüştürülüyor. Bu işlemi yaparken yine Rust'ın yine
+en önemli özelliklerinden biri olan <a href="https://doc.rust-lang.org/book/ch06-02-match.html">pattern
+matching</a> kullanıyoruz.
+<code>match</code> C de yer alan switch-case'e çok benzemesine rağmen, <code>match</code> edilen
+değerin tüm elemanlarını kapsamak zorundadır. Biz bu işlemi yaparken
+16-bitlik bir sayı kullandığımızdan, işimize yarayan tüm değerleri aldık ve
+geri kalan ve işimize yaramayanlar içinde <code>_</code> elemanını kullandık.</p>
+<p><code>match</code> bloğumuz <code>Option&lt;Instruction&gt;</code> döndüğü sürece,
+iç içe istediğimiz kadar <code>match</code> kullanabiliriz. Bu nedenle önce en soldaki
+nibble kontrol edildikten sonra, aynı nibble ile başlayan OPCODE'lar
+tekrar <code>match</code> ile kontrol edildip, OPCODE'a uyan bir <code>Instruction</code>
+tipi oluşturuluyor.</p>
+<p><code>Instruction</code> tipimizi içerisinde veri barındıran (daha önce tanımladığımız
+<code>Address</code>, <code>Register</code> vb.) bileşenler barındırdığından, <code>Instruction</code> tipi
+oluşturulurken bu bileşenlere gerekli değerler atanır. Bu işlemi yaparken
+daha önce <code>Opcode</code> tipine eklediğimiz yardımcı fonksiyonları kullanıyoruz.</p>
+<p>Rust'ta her satır aynı zamanda bir deyim olduğundan ve <code>match</code> bloğumuz da
+aynı zamanda <code>Option&lt;Instruction&gt;</code> döndüğünden, <code>return</code> anahtar kelimesini
+kullanmamıza gerek yok. Deyim olarak kullanılan bu match bloğunun sonunda
+<code>;</code> olmamasına dikkat edin.</p>
+<p>Son olarak Rust'ta yorum satırları <code>//</code> ile başlar. Rust içerisinde çok
+gelişmiş bir belgeleme aracı (rustdoc) da bulundurmaktadır. Herhangi bir
+tanımdan önce (bu bir metod, fonksiyon, struct, bileşen  ya da alan
+olabilir); 3 slash ile (<code>///</code>) oluşturacağınız yorum satırı, belgeleme
+aracı ile oluşturacağınız belgede o alan için tanımlama yapar. Kodlarken
+yazabileceğiniz bu yorum satırları, aynı zamanda herhangi bir Rust
+kütüphanesinin belgelemesini de çok kolay bir hale getirir.</p>
+<h1><a class="header" href="#emulatör-yapısı" id="emulatör-yapısı">Emulatör Yapısı</a></h1>
+<p>CHIP-8'in tüm sistem özelliklerini biliyoruz. Bunların hepsini
+<code>emulator.rs</code> içerisinde yeni bir yapı içerisinde tanımlayalım,
+bu sefer yapımızı tanımlarken içerisinde elemanları olan bir yapı
+tanımlayacağız:</p>
+<pre><code class="language-rust no_run noplaypen">pub struct Emulator {
+    /// Bellek 4KB
+    memory: [u8; 4096],
+
+    /// Genel amaçlı registerlar
+    v: [u8; 16],
+
+    /// Bellek adresini tutmaya yarayan register
+    i: u16,
+
+    /// Program sayacı (program counter)
+    pc: u16,
+
+    /// Stack
+    stack: [u16; 16],
+
+    /// Stack'ın en üstünü tutan stack pointeri
+    sp: u8,
+
+    /// Gecikme zamanlayıcısı
+    delay_timer: u8,
+
+    /// Ses zamanlayıcısı
+    sound_timer: u8,
+
+    /// Görüntü yapısı
+    display: Display,
+
+    /// Klavye yapısı
+    keyboard: Keyboard,
+}
+</code></pre>
+<p>Rust static ve strong yazılımlı bir dil olduğundan, tüm alanların tipleri
+de tanımlanmak zorundadır. Diğer dillerin aksine tip tanımlamaları sağ
+tarafta yer alır.</p>
+<h2><a class="header" href="#yeni-bir-emulator-instanceı-oluşturulması" id="yeni-bir-emulator-instanceı-oluşturulması">Yeni Bir Emulator Instance'ı Oluşturulması</a></h2>
+<p>Öncelikle <code>Emulator</code> yapımızı, varsayılan değerleriyle bir instance'ını
+oluşturan yeni bir fonksiyon tanımlayalım.</p>
+<pre><code class="language-rust no_run noplaypen">impl Emulator {
+    pub fn new() -&gt; Emulator {
+        let mut emulator = Emulator {
+            memory: [0; 4096],
+            v: [0; 16],
+            i: 0x200,
+            pc: 0x200,
+            stack: [0; 16],
+            sp: 0,
+            delay_timer: 0,
+            sound_timer: 0,
+            display: Display::new(),
+            keyboard: Keyboard::new(),
+        };
+
+        for (i, font) in FONTSET.iter().enumerate() {
+            emulator.memory[i] = *font;
+        }
+
+        emulator
+    }
+}
+</code></pre>
+<p>Bu kod bloğunu satır satır inceleyelim:</p>
+<p><code>impl</code> anahtar kelimesi ve yapı adıyla başlayan bu satır, parantezler
+içerisinde yer alan fonksiyon ve method tanımlamalarının, bu yapı için
+kullanılacağını belirtir. <code>impl</code> ile sadece kendi paketiniz içerisinde
+oluşturduğunuz yapılar için fonksiyon ve methodlar ekleyebilirsiniz. Eğer
+başka bir pakette veya standart kütüphanede yer alan başka bir yapıya yeni
+bir fonksiyon eklemek isterseniz, yeni bir yapı oluşturmanız gerekmektedir.</p>
+<p>Emulator yapımızın hiç bir alanı açık (public) olmadığından, bu yapının
+instance'ını sadece bu yapı içinde tanımlanmış fonksiyon ve metodlardan
+erişebilirsiniz. Bu modül dışında Emulator yapısını direkt <code>Emulator { ... }</code>
+şeklinde oluşturmaya çalışırsanız, alanların public olmadığına dair hata
+alırsınız.</p>
+<pre><code class="language-rust no_run noplaypen">        let mut emulator = Emulator {
+            memory: [0; 4096],
+            v: [0; 16],
+            i: 0x200,
+            pc: 0x200,
+            stack: [0; 16],
+            sp: 0,
+            delay_timer: 0,
+            sound_timer: 0,
+            display: Display::new(),
+            keyboard: Keyboard::new(),
+        };
+</code></pre>
+<p>Değişken tanımlamaları <code>let</code> anahtar kelimesi ile yapılır. Rust'ta her
+değişken varsayılan olarak immutable (içeriği değiştirilemez) haldedir. Biz
+fonksiyonumuzun devamında, emülatör belleğine font setini yükleyeceğimizden
+içeriği değiştirilebilir bir değişkene ihtiyacımız var. Bu nedenle <code>let</code>
+tanımlamamızın ardından <code>mut</code> anahtar kelimesini kullanıyoruz. <code>mut</code>
+anahtar kelimesi o değişkeni mutable (içeriği değiştirilebilir) duruma
+getirmektedir. CHIP-8 programları belleğin <code>0x200</code> alanından
+başlayacağından, I ve PC registerları 0x200 yapılır. Onun dışında her alan
+0 olacak şekilde bir Emulator instance'ı oluşturulur.</p>
+<p>Şu an için <code>Display</code> ve <code>Keyboard</code> yapılarını görmezden gelin. Görüntü ve
+klavye işlemlerinin yapıldığı bu yapılar ileride anlatılacaktır.</p>
+<pre><code class="language-rust no_run noplaypen">        for (i, font) in FONTSET.iter().enumerate() {
+            emulator.memory[i] = *font;
+        }
+</code></pre>
+<p>CHIP-8: 0 dan F'e olmak üzere 5 byte uzunluğunda sprite gösterme özelliğine
+sahiptir (16*5=80). Bu font bilgisi daha önce tanımlanmış bir değişken
+üzerinden emülatör belleğine yüklenir. <code>FONTSET</code> array'ının içeriğini
+<a href="https://github.com/onur/chip8/blob/master/src/emulator.rs#L302-L308">kaynak kodlarında</a>
+görebilirsiniz. Rust'ta arraylar
+<a href="https://doc.rust-lang.org/std/iter/index.html#iterator"><code>Iterator</code></a>
+özelliğine sahip olduğundan <code>iter()</code> metodu yardımıyla kolayca
+iterator'e dönüştürülebilir. <code>enumerate</code> metodu ise aynı Python'da olduğu
+gibi item ile birlikte iterasyon sayacını döner. Bu metod sayaç ve item
+değerlerini dönen bir tuple olduğundan, for döngüsü tuple değişken
+tanımlamalarıyla kullanılır.</p>
+<p>Son olarak fonksiyonumuz içerisinde yer alan <code>emulator</code> satırı,
+fonksiyonumuzdan <code>emulator</code> değişkenimizin dönmesine yarar.</p>
+<h1><a class="header" href="#rom-okunması" id="rom-okunması">ROM Okunması</a></h1>
+<p>Herhangi bir işlem yapmadan önce emülatör belleğimizde bir CHIP-8 programı
+yüklememiz gerekli. Sonuçta emulatörümüz bu CHIP-8 programını çalıştırmaya
+yarayacak. Bu işlemi gerçekleştirmek için önce bir dosya açmalı, bu dosya
+içerisindeki byteları <code>Emulator</code> belleği'ne (memory alanı) yazmamız
+gerekli. Öncelikle bu işlemi yapmak için gerekli tipleri modül içinde
+kullanalım:</p>
+<pre><code class="language-rust no_run noplaypen">use std::fs::File;
+use std::io;
+use std::io::Read;
+use std::path::Path;
+</code></pre>
+<p>Rust'ta başka bir paket ya da standart kütüphaneden herhangi bir yapı
+kullanabilmek için <code>use</code> anahtar kelimesi kullanılır. İlk satırda
+kullanılan use, <code>std::fs</code> modülü içerisinde yer alan <code>File</code> yapısını
+üzerinde çalıştığımız modül içinde kullanmaya yarar. Bu sayede <code>File</code>
+yapısında direkt ulaşabiliriz. İkinci satırda <code>std::io</code> modülünü kullanıyoruz.
+Bu kullanımın ardından modül içerisinde yazacağımız her <code>io</code>,
+standart kütüphanede yer alan <code>io</code> modülünü simgelemektedir.
+<code>Read</code> özelliği, <code>File</code> üzerinde okuma yapmamız için gerekli.Son olarak dosya
+yolu değişkeninde kullanacağımız <code>Path</code> yapısını kullanılıyoruz.</p>
+<p>ROM okuma metodumuzu <code>impl Emulator</code> bloğu içerisine tanımlıyoruz:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn rom_oku&lt;P: AsRef&lt;Path&gt;&gt;(mut self, path: P) -&gt; io::Result&lt;Emulator&gt; {
+        let file = File::open(path)?;
+        for (loc, byte) in file.bytes().enumerate() {
+            self.memory[0x200 + loc] = byte?;
+        }
+        Ok(self)
+    }
+</code></pre>
+<p><code>rom_oku</code> isimli bu metod, <code>Emulator</code> instance'ının bir parçası olduğundan
+ilk parametresi: <code>&amp;mut self</code>'dir. Instance'ın sahipliğini, bu fonksiyona
+almamak için, <code>self</code> referans olarak kullanılır. Eğer sadece <code>self</code> olarak
+kullansaydık, instance sahipliği bu fonksiyonun çağrılmasıyla, bu
+fonksiyona geçecekti ve bir daha dışarıdan erişime izin verilmeyecekti. Bu
+referansın mutable olmasının nedeni ise emulatör içerisinde yer alan bellek
+(memory) alanını değiştiriyor olmamızdan kaynaklanıyor. Eğer bu referans
+mutable olmasaydı, <code>Emulator</code> yapımızda yer alan hiç bir alanı
+değiştiremezdik. <code>path</code> değişkeni Rust'ta referansdan-referansa dönüşüm
+yapmayı mümkün kılan
+<a href="https://doc.rust-lang.org/std/convert/trait.AsRef.html"><code>AsRef</code></a>
+özelliğine sahip bir genelleyici seçilmiştir. Bu sayede <code>path</code> değişkeni
+<code>AsRef&lt;Path&gt;</code> özelliğine sahip herhangi bir tip olabilir (String, &amp;str,
+OsStr, Path, PathBuf vb.).</p>
+<p>Metodumuzda hata yönetimi yapmak için; fonksiyon tanımlamamızda dönüş
+değeri, yine standart kütüphanenin io (girdi-çıktı) modülünde yer alan
+<code>Result</code> tipini kullanıyoruz. Bizim kullandığımız <code>io::Result</code> tipi;
+<code>std::result::Result</code> tipiyle karıştırılmamalıdır. Normal <code>Result</code>
+tanımlaması, hem dönüş tipi hem de hata tipi gerektirir. Bizim bu metodda
+kullanacağımız tüm hata dönebilecek fonksiyonlar <code>io::Error</code> tipinde
+olduğundan, <code>io::Result</code> tipini kullanmamız yeterli. <code>io::Result</code> sadece
+dönüş için gerekli bir tip gerektirdiğinden ve biz bu metoddan 
+<code>self</code> ile sahipliğini aldığımız <code>Emulator</code> instance'ını döneceğimizden,
+dönüş tipi olarak <code>Emulator</code> kullanılır.</p>
+<p>Dosya
+<a href="https://doc.rust-lang.org/std/fs/struct.File.html#metod.open"><code>let file = File::open(path)?;</code></a>
+ile açılıyor. Bu satırda yer alan <code>?</code> hata yönetimimiz için gerekli. Bu
+fonksiyon normalde
+<a href="https://doc.rust-lang.org/std/io/type.Result.html"><code>io::Result</code></a>
+dönüyor ve bu <code>Result</code> tipi hata olması
+durumunda <code>Err</code> (bizim kullandığımız <code>Result</code> tipine göre <code>io::Error</code>),
+olmaması halinde ise <code>Ok</code> değeri döner. <code>?</code> ile yaptığımız hata kontrolü
+sayesinde, bu fonksiyonun <code>Err</code> dönmesi durumunda, operatörümüz o noktada
+gelen hatayı dönmeye yarıyor. Rust'ın bu gelişmiş hata yönetimi sayesinde,
+hata kontrolü için yazılması gereken kod çok daha azalıyor ve bu basit
+kullanım Rust'ın hata yönetimini çok daha güçlü hale getiriyor.</p>
+<p><a href="https://doc.rust-lang.org/std/io/trait.Read.html#metod.bytes"><code>Read::bytes()</code></a>
+metodu, okunabilir instance'ı byteları iteratöre çevirmeye yarıyor. For
+ile kullandığımız bu iterator hata olması durumunda yine <code>io::Result</code> dönen
+bir yapıya sahip. Bu nedenle direkt byte'ı kullanmadan önce hata kontrolü
+operatörümüz olan <code>?</code>'ini kullanıyoruz. CHIP-8'de programlar bellekte
+<code>0x200</code> adresinden başladığından dolayı, belleğin <code>0x200</code> alanından itibaren
+yazıyoruz.</p>
+<p>İlk başta tanımladığımız gibi metodumuz <code>io::Result&lt;Emulator&gt;</code> dönmesi
+gerekli. Fonksiyonumuz son satıra ulaştığında herhangi bir hata olmaması
+durumunda, sahipliğini aldığımız instance ile birlikte  <code>Ok(self)</code> dönüyor.
+Bu sayede bu metodu kullanırken sahipliğini aldığımız instance'ı bir zincir
+halinde kullanabiliriz.</p>
+<h1><a class="header" href="#instructionların-alınması" id="instructionların-alınması">Instruction'ların Alınması</a></h1>
+<p>ROM'umuzu emülatör belleğine yüklediğimize göre, artık OPCODE'ları okumaya
+ve onları çalıştırmaya başlayabiliriz.</p>
+<p>CHIP-8 OPCODE'ları 2 byte uzunluğundadır. Belleğimizde her bir alan 1 byte
+uzunluğunda olduğundan, 2 byte okuyup bunları birleştirmemiz gerekli.
+Örnek olarak bellek üzerinde şu iki byte düşünüldüğünde:</p>
+<pre><code class="language-plain">memory[pc]     == 0xA2
+memory[pc + 1] == 0xF0
+</code></pre>
+<p>Bu iki byte'ı 16-bit'lik bir sayı yapmak için, öncelikle <code>0xA2</code> değeri
+16-bitlik bir sayıya çevrilir ve ardından 8-bit sol tarafa kaydırılır (left
+shift). Ardından bitwise OR ile bir sonraki byte yeni değere eklenir:</p>
+<pre><code class="language-plain">0xA2            10100010           // 8-bitlik değer 16-bit'e çevrilir
+0x00A2  0000000010100010 &lt;&lt; 8      // Ardından 8-bit sola kaydırılır
+0xA200  1010001000000000 | 0x00F0  // Ardından sonraki byte (0xF0) XOR ile eklenir
+0xA2F0  1010001011110000
+</code></pre>
+<p>Bu işlemi Rust ile <code>impl Emulator</code> bloğu içine tanımladığımız metodla
+şu şekilde yapabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">    fn instruction_oku(&amp;self) -&gt; Option&lt;Instruction&gt; {
+        let opcode = (self.memory[self.pc as usize] as u16) &lt;&lt; 8
+            | (self.memory[(self.pc + 1) as usize] as u16);
+        Instruction::new(opcode)
+    }
+</code></pre>
+<p>Bu şekilde program counter'da tutulan bellek alanından 2 byte'lık OPCODE okunur
+bitwise OR işlemi ile birbirine eklenir ve tanımladığımız <code>Instruction</code> tipine
+dönüştürülür. Daha önce <code>Instruction</code>'a eklediğimiz <code>From&lt;u16&gt;</code> özelliği
+sayesinde, <code>opcode</code> değişkenine herhangi bir işlem yapmadan <code>Instruction::new</code>
+metodunda kullanabiliriz.</p>
+<h1><a class="header" href="#instructionların-Çalıştırılması" id="instructionların-Çalıştırılması">Instruction'ların Çalıştırılması</a></h1>
+<p>Artık bellekten instructionları okuyup kendi tipimiz olan <code>Instruction</code>'a
+dönüştürdüğümüze göre, çalıştırma aşamasına geçebiliriz. Instructionların
+tam olarak ne yaptıklarını ayrıntılı olarak
+<a href="./instruction-yapisi.html">Instruction Yapısı</a>'nda tanımlamıştık. Şimdi bu
+<code>enum</code>'un tüm bileşenlerini işleyeceğimiz bir <code>match</code> deyimi tanımlayalım.</p>
+<p>Her bir instruction program counter'ı (<code>self.pc</code>) değiştireceğinden,
+<code>match</code> deyimimiz, her bir işlemden sonra program counter'ın yeni değerini
+dönüyor.</p>
+<p>Bunun dışında Rust'a ait range operatörünü bir çok yerde kullanıyoruz.
+Farklı bir syntax olarak <code>0..=x</code> gözünüze çarpabilir. Bu range operatörü <em>0
+dan x + 1'e kadar</em> sayıları oluşturmaya yarıyor.</p>
+<p>CHIP-8'de her bir instruction 2 byte olduğundan, bir çok instruction
+program counter'ı 2 byte arttırıyor. Bir sonraki instruction'ı atlamamız
+gereken durumlarda ise program counter, 4 byte arttırılıyor.</p>
+<p>Bunun dışında overflow olabilecek toplama ve çıkarma işlemlerinde, <code>+</code> veya
+<code>-</code> operatörlerini direkt kullanmak yerine,
+<a href="https://doc.rust-lang.org/std/primitive.u8.html#method.overflowing_add"><code>overflow_add</code></a>
+ve
+<a href="https://doc.rust-lang.org/std/primitive.u8.html#method.overflowing_sub"><code>overflow_sub</code></a>
+metodlarını kullanacağız. Rust
+güvenli bir dil olduğundan overflow durumlarında panikleyerek çıkar.
+<code>overflow_add</code> ve <code>overflow_sub</code> metodları istediğimiz gibi
+toplama ve çıkarma işlemini yaptıktan sonra, overflow olursa bu durumu da
+dönüyorlar. Zaten CHIP-8'de overflow durumları da <code>F</code> registerinde
+saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.</p>
+<pre><code class="language-rust no_run noplaypen">    fn instruction_calistir(&amp;mut self, instruction: Instruction) {
+        self.pc = match instruction {
+            Instruction::ClearDisplay =&gt; {
+                self.display.clear();
+                self.pc + 2
+            }
+            Instruction::Return =&gt; {
+                self.sp -= 1;
+                self.stack[self.sp as usize] + 2
+            }
+            Instruction::Jump(addr) =&gt; addr,
+            Instruction::Call(addr) =&gt; {
+                self.stack[self.sp as usize] = self.pc as u16;
+                self.sp += 1;
+                addr
+            }
+            Instruction::SkipIfEqualsByte(x, v) =&gt; {
+                if self.v[x] == v {
+                    self.pc + 4
+                } else {
+                    self.pc + 2
+                }
+            }
+            Instruction::SkipIfNotEqualsByte(x, v) =&gt; {
+                if self.v[x] == v {
+                    self.pc + 2
+                } else {
+                    self.pc + 4
+                }
+            }
+            Instruction::SkipIfEqual(x, y) =&gt; {
+                if self.v[x] == self.v[y] {
+                    self.pc + 4
+                } else {
+                    self.pc + 2
+                }
+            }
+            Instruction::LoadByte(x, v) =&gt; {
+                self.v[x] = v;
+                self.pc + 2
+            }
+            Instruction::AddByte(x, v) =&gt; {
+                let (res, _) = self.v[x].overflowing_add(v);
+                self.v[x] = res;
+                self.pc + 2
+            }
+            Instruction::Move(x, y) =&gt; {
+                self.v[x] = self.v[y];
+                self.pc + 2
+            }
+            Instruction::Or(x, y) =&gt; {
+                self.v[x] |= self.v[y];
+                self.pc + 2
+            }
+            Instruction::And(x, y) =&gt; {
+                self.v[x] &amp;= self.v[y];
+                self.pc + 2
+            }
+            Instruction::Xor(x, y) =&gt; {
+                self.v[x] ^= self.v[y];
+                self.pc + 2
+            }
+            Instruction::Add(x, y) =&gt; {
+                let (res, overflow) = self.v[x].overflowing_add(self.v[y]);
+                self.v[x] = res;
+                self.v[0x0F] = if overflow { 1 } else { 0 };
+                self.pc + 2
+            }
+            Instruction::Sub(x, y) =&gt; {
+                let (res, overflow) = self.v[x].overflowing_sub(self.v[y]);
+                self.v[x] = res;
+                self.v[0x0F] = if overflow { 0 } else { 1 };
+                self.pc + 2
+            }
+            Instruction::ShiftRight(x) =&gt; {
+                self.v[0x0F] = self.v[x] &amp; 0x1;
+                self.v[x] &gt;&gt;= 1;
+                self.pc + 2
+            }
+            Instruction::ReverseSub(x, y) =&gt; {
+                self.v[0x0F] = if self.v[x] &gt; self.v[y] { 0 } else { 1 };
+                self.v[x] = self.v[y] - self.v[x];
+                self.pc + 2
+            }
+            Instruction::ShiftLeft(x) =&gt; {
+                self.v[0x0F] = self.v[x] &gt;&gt; 7;
+                self.v[x] &lt;&lt;= 1;
+                self.pc + 2
+            }
+            Instruction::SkipIfNotEqual(x, y) =&gt; {
+                if self.v[x] == self.v[y] {
+                    self.pc + 2
+                } else {
+                    self.pc + 4
+                }
+            }
+            Instruction::LoadI(addr) =&gt; {
+                self.i = addr;
+                self.pc + 2
+            }
+            Instruction::JumpPlusZero(addr) =&gt; addr + (self.v[0] as u16),
+            Instruction::Random(x, val) =&gt; {
+                self.v[x] = val &amp; rand::random::&lt;u8&gt;();
+                self.pc + 2
+            }
+            Instruction::Draw(x, y, n) =&gt; {
+                let from = self.i as usize;
+                let to = from + n as usize;
+                let x = self.v[x];
+                let y = self.v[y];
+                self.v[0x0F] = self
+                    .display
+                    .draw(x as usize, y as usize, &amp;self.memory[from..to]);
+                self.pc + 2
+            }
+            Instruction::SkipIfPressed(x) =&gt; {
+                if self
+                    .keyboard
+                    .pressed_key()
+                    .map_or(false, |key| key == self.v[x])
+                {
+                    self.pc + 4
+                } else {
+                    self.pc + 2
+                }
+            }
+            Instruction::SkipIfNotPressed(x) =&gt; {
+                if self
+                    .keyboard
+                    .pressed_key()
+                    .map_or(false, |key| key == self.v[x])
+                {
+                    self.pc + 2
+                } else {
+                    self.pc + 4
+                }
+            }
+            Instruction::LoadDelayTimer(x) =&gt; {
+                self.v[x] = self.delay_timer;
+                self.pc + 2
+            }
+            Instruction::WaitForKeyPress(x) =&gt; {
+                if let Some(key) = self.keyboard.pressed_key() {
+                    self.v[x] = key;
+                    self.pc + 2
+                } else {
+                    self.pc
+                }
+            }
+            Instruction::SetDelayTimer(x) =&gt; {
+                self.delay_timer = self.v[x];
+                self.pc + 2
+            }
+            Instruction::SetSoundTimer(x) =&gt; {
+                self.sound_timer = self.v[x];
+                self.pc + 2
+            }
+            Instruction::AddToI(x) =&gt; {
+                self.i += self.v[x] as u16;
+                self.pc + 2
+            }
+            Instruction::LoadSprite(x) =&gt; {
+                self.i = self.v[x] as u16 * 5;
+                self.pc + 2
+            }
+            Instruction::BCDRepresentation(x) =&gt; {
+                self.memory[self.i as usize] = self.v[x] / 100;
+                self.memory[self.i as usize + 1] = (self.v[x] / 10) % 10;
+                self.memory[self.i as usize + 2] = (self.v[x] % 100) % 10;
+                self.pc + 2
+            }
+            Instruction::StoreRegisters(x) =&gt; {
+                for i in 0..=x {
+                    self.memory[self.i as usize + i] = self.v[i]
+                }
+                self.i += x as u16 + 1;
+                self.pc + 2
+            }
+            Instruction::LoadRegisters(x) =&gt; {
+                for i in 0..=x {
+                    self.v[i] = self.memory[self.i as usize + i]
+                }
+                self.i += x as u16 + 1;
+                self.pc + 2
+            }
+        };
+    }
+</code></pre>
+<h1><a class="header" href="#görüntü-yapısı" id="görüntü-yapısı">Görüntü Yapısı</a></h1>
+<p>Emülatörümüzün temel fonksiyonlarını tamamladıktan sonra, ekrana görüntü
+vereceğimiz yapımızın tanımına geçebiliriz. Öncelikle kullanacağımız
+yapıları modülümüze ekleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">use minifb::{Key, Scale, Window, WindowOptions};
+</code></pre>
+<p><a href="https://github.com/emoon/rust_minifb">minifb</a> daha önce de bahsettiğimiz
+gibi en yaygın işletim sistemlerinde bir pencere açıp içerisine bir şeyler
+çizebileceğimiz basit bir paket. Aynı zamanda basılan tuşları da
+alabildiği için bizim için biçilmiş kaftan. Yapıları kullanıma aldıktan
+sonra bazı sabitleri tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">const WIDTH: usize = 64;
+const HEIGHT: usize = 32;
+const FOREGROUND_COLOR: u32 = 0x5294e2;
+const BACKGROUND_COLOR: u32 = 0x282c34;
+</code></pre>
+<p>CHIP-8 64x32 piksel boyutunda bir ekrana sahip. Bu nedenle genişlik (<code>WIDTH</code>)
+ve yükseklik (<code>HEIGHT</code>) olarak iki sabit tanımlaması yaptık. Ayrıca arka
+plan rengi ve ön plan rengi olmak üzere iki 32-bit cinsinden sayı
+tanımladık. minifb 32-bit cinsinden olan değerleri ekrana cizebilir,
+isterseniz burada farklı renkler seçebilirsiniz.</p>
+<p>Rust'ta sabit tanımlamaları <code>const</code> anahtar kelimesiyle yapılır. Tüm
+sabitler <code>'static</code> ömrüne sahiptir.</p>
+<p>Artık görüntü yapımızı tanımlayabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">pub struct Display {
+    buffer: [[u8; WIDTH]; HEIGHT],
+    window: Window,
+}
+</code></pre>
+<p>CHIP-8 siyah beyaz bir ekrana sahip olduğundan görüntü buffer'ı 8-bitlik
+64x32 boyutunda bir matris. Bu buffer içerisinde dolu pikseller için 1, boş
+pikseller için 0 değerini kullanacağız. <code>window</code> alanı için de minifb'nin
+<code>Window</code> tipini kullanıyoruz.</p>
+<h3><a class="header" href="#görüntü-metodlarının-uygulanması" id="görüntü-metodlarının-uygulanması">Görüntü Metodlarının Uygulanması</a></h3>
+<pre><code class="language-rust no_run noplaypen">impl Display {
+}
+</code></pre>
+<p>Bloğunu oluşturarak görüntü metodlarını eklemeye başlayalım.</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn new() -&gt; Self {
+        Self {
+            buffer: [[0; WIDTH]; HEIGHT],
+            window: Window::new(
+                &quot;Rust ile CHIP-8&quot;,
+                WIDTH,
+                HEIGHT,
+                WindowOptions {
+                    scale: Scale::X16,
+                    ..WindowOptions::default()
+                },
+            )
+            .expect(&quot;Pencere oluşturulurken hata oluştu&quot;),
+        }
+    }
+</code></pre>
+<p><code>new</code> metodumuz yeni bir <code>Display</code> instance'ı oluşturmaya yarıyor. Burada
+kullanmış olduğumuz <code>Self</code>; <code>Dislay</code> ile aynı anlama geliyor. İsterseniz
+<code>impl</code> bloğunda tekrar tekrar tip ismini yazmak yerine <code>Self</code> anahtar
+kelimesini kullanabilirsiniz. Unutmayın ki birinci harf büyük olmalı ve bu
+anahtar kelime, metod argümanlarında kullanılan <code>self</code> ile
+karıştırılmamalıdır.</p>
+<p><a href="https://docs.rs/minifb/0.13.0/minifb/struct.WindowOptions.html"><code>WindowOptions</code></a>
+yapısı tamamen açık (public) alanlara sahip bir yapı. Bu nedenle bu yapı
+için herhangi bir yardımcı metod olmadan direkt instance oluşturabiliriz.
+Biz varsayılan (<a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html"><code>Default</code></a>)
+özelliği eklenmiş bu yapının, sadece <code>scale</code> alanını değiştireceğimizden,
+geri kalan alanların varsayılan değeri alması için <code>..WindowOptions::default()</code>
+yazımını kullandık. Rust'ta kullanılan bu yazım, yapının tanımlanmamış
+diğer alanları için varsayılan değerleri almasını sağlıyor. 64x32 piksel
+modern bir bilgisayarda çok küçük olacağı için, <code>scale</code> ile belirlediğimiz
+değerle, minifb paketi görütüyü belirlenen oranda arttırıyor (bizim
+belirlediğimiz X16 oranında).</p>
+<p>Metodumuzda şu an için herhangi bir hata yönetimi yapmadığımızdan dolayı,
+pencere oluşturulurken karşılaşacağımız olası bir hata durumunda <code>expect</code>
+ile panikleyip çıkıyoruz.</p>
+<h3><a class="header" href="#yardımcı-metodlar" id="yardımcı-metodlar">Yardımcı Metodlar</a></h3>
+<pre><code class="language-rust no_run noplaypen">    pub fn is_open(&amp;self) -&gt; bool {
+        self.window.is_open() &amp;&amp; !self.window.is_key_down(Key::Escape)
+    }
+
+    pub fn clear(&amp;mut self) {
+        self.buffer = [[0; WIDTH]; HEIGHT];
+    }
+</code></pre>
+<p><code>is_open</code> metodu adından da anlaşılabileceği gibi, penceremizin açık olup
+olmadığını kontrol ediyor. Aynı zamanda <code>Esc</code> tuşunun basılı olup
+olmadığını da kontrol eden bu metod <code>bool</code> dönüyor. Bu sayede oyuncu
+istediği zaman <code>Esc</code> tuşuna basarak pencereyi kapatabilir ve emülatörü
+sonlandırabilir.</p>
+<p><code>clear</code> metodu, yapımız içerisinde yer alan buffer'ı temizlemeye yarıyor.</p>
+<h3><a class="header" href="#draw-instructionı-ile-Çizim" id="draw-instructionı-ile-Çizim">Draw Instruction'ı ile Çizim</a></h3>
+<p>CHIP-8 draw instruction'ı daha önce belirlediğimiz gibi:</p>
+<pre><code class="language-rust no_run noplaypen">    /// 0xDxyn DRW: `x` ve `y` registerinden başayarak `n` adet byte sprite'ı ekranda
+    /// gösterir. Çakışma (collision) durumu `F` registerinde tutulur.
+    Draw(Register, Register, u8),
+</code></pre>
+<p>Şeklinde yapıyor. Aynı zamanda CHIP-8 sadece bu instruction ile collision
+(spriteların birbiriyle çakışma) durumunu kontrol edebiliyor. Bu işlemi şu
+şekilde yapabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn draw(&amp;mut self, x: usize, y: usize, sprite: &amp;[u8]) -&gt; u8 {
+        let mut collision = 0;
+        let mut xi: usize;
+        let mut yj: usize;
+
+        for (j, sprite) in sprite.iter().enumerate() {
+            for i in 0..8 {
+                xi = (x + i) % WIDTH;
+                yj = (y + j) % HEIGHT;
+
+                if sprite &amp; (0x80 &gt;&gt; i) != 0 {
+                    if self.buffer[yj][xi] == 1 {
+                        collision = 1
+                    }
+                    self.buffer[yj][xi] ^= 1;
+                }
+            }
+        }
+
+        self.draw_screen();
+        collision
+    }
+</code></pre>
+<p><code>sprite</code> bellekten gelen 8-bitlik verilere sahip bir slice. Öncelikle
+for döngümüz her bir sprite için <code>j</code> sayacıyla çalışıyor. Ardından ikinci
+for döngüsünde 8-bitlik verinin her bir bitini kontrol etmeye başlıyoruz.
+<code>xi</code> ve <code>yj</code> ile yazılacak bit'in ekrandaki pozisyonu belirleniyor.
+Ardından her bir bit: <code>0x80: 10000000</code> üzerinde çalıştığımız bit kadar (<code>i</code>)
+sağa kaydırılarak sprite ile XOR işlemi sayesinde herhangi bir çizilecek
+piksel varsa 1, yoksa 0 sonucu elde ediliyor. Ardından daha önce aynı
+pozisyonda herhangi sprite çizildiyse çakışma değeri olan <code>collision</code> 1
+yapılıyor.</p>
+<p>Son olarak CHIP-8'de spritelar ekrana XOR ile çizildiği için, üzerinde
+çalıştığımız piksel 1 ile XOR işlemi ile belirleniyor.</p>
+<h3><a class="header" href="#bufferın-pencereye-Çizimi" id="bufferın-pencereye-Çizimi"><code>buffer</code>'ın Pencereye Çizimi</a></h3>
+<p>minifb <code>&amp;[u32]</code> tipinden bir yapıyı ekrana çizebilir. Bu nedenle
+<code>[[0; WIDTH]; HEIGHT]</code> tipinden olan matrisimizi <code>[u32]</code> tipden bir array'a
+çevirmemiz gerekli. Bu işlemi daha önce sabit olarak belirlediğimiz
+arkaplan ve önplan rengini de kullanarak şu şekilde yapabiliriz:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn draw_screen(&amp;mut self) {
+        let mut buffer = [0; WIDTH * HEIGHT];
+        let mut loc = 0;
+        for y in 0..HEIGHT {
+            for x in 0..WIDTH {
+                buffer[loc] = if self.buffer[y][x] == 1 {
+                    FOREGROUND_COLOR
+                } else {
+                    BACKGROUND_COLOR
+                };
+                loc += 1;
+            }
+        }
+        self.window.update_with_buffer(&amp;buffer).unwrap();
+    }
+</code></pre>
+<h3><a class="header" href="#referanstan-referansa-dönüştürme-ile-pencere-alanının-alımı" id="referanstan-referansa-dönüştürme-ile-pencere-alanının-alımı">Referanstan-referansa Dönüştürme ile Pencere Alanının Alımı</a></h3>
+<p>İleride yazacağımız emülasyon döngüsü için, <code>Display</code> yapımız içerisinde
+yer alan <code>window</code> alanına ulaşabilmemiz gerekli. Bu işlemi Rust'ın
+referanstan-referansa çevirme işlemi yapan
+<a href="https://doc.rust-lang.org/std/convert/trait.AsMut.html"><code>AsMut</code></a>
+özelliği ile yapacağız. <code>Display</code> yapımıza <code>AsMut</code> özelliğini katalım ve
+<code>as_mut</code> çağrıldığında <code>Window</code> tipini dönelim:</p>
+<pre><code class="language-rust no_run noplaypen">impl AsMut&lt;Window&gt; for Display {
+    fn as_mut(&amp;mut self) -&gt; &amp;mut Window {
+        &amp;mut self.window
+    }
+}
+</code></pre>
+<h1><a class="header" href="#klayve-yapısı" id="klayve-yapısı">Klayve Yapısı</a></h1>
+<p>CHIP-8 daha önce bahsettiğimiz gibi:</p>
+<pre><code class="language-plain">+---+---+---+---+
+| 1 | 2 | 3 | C |
+| 4 | 5 | 6 | D |
+| 7 | 8 | 9 | E |
+| A | 0 | B | F |
++---+---+---+---+
+</code></pre>
+<p>Şeklinde bir klavyeye sahip. Tuşları alabilmek için <code>minifb::Key</code> yapısını
+kullanacağız. Modern bir bilgisayarda basılan tuşları, CHIP-8'in
+anlayabileceği türe çevirmek için basit bir yapı tanımlayalım:</p>
+<pre><code class="language-rust no_run noplaypen">use minifb::Key;
+
+pub struct Keyboard(Option&lt;u8&gt;);
+</code></pre>
+<p>Yapımızda herhangi bir tuşun basılı olup olmadığını kontrol edebilmek için
+<code>Option&lt;u8&gt;</code> kullandık. Bu değer bir tuş basılıysa <code>Some&lt;u8&gt;</code>, değilse
+<code>None</code> değerlerini içerecek.</p>
+<p>Bunun ardından klavye metodlarını ekleyelim:</p>
+<pre><code class="language-rust no_run noplaypen">impl Keyboard {
+    pub fn new() -&gt; Keyboard {
+        Keyboard(None)
+    }
+    pub fn press_key(&amp;mut self, key: Key) {
+        self.0 = self.to_chip8_key(key);
+    }
+    pub fn release_key(&amp;mut self) {
+        self.0 = None;
+    }
+    pub fn pressed_key(&amp;self) -&gt; Option&lt;u8&gt; {
+        self.0
+    }
+    fn to_chip8_key(&amp;self, key: Key) -&gt; Option&lt;u8&gt; {
+        match key {
+            Key::Key1 =&gt; Some(0x01),
+            Key::Key2 =&gt; Some(0x02),
+            Key::Key3 =&gt; Some(0x03),
+            Key::Key4 =&gt; Some(0x0C),
+
+            Key::Q =&gt; Some(0x04),
+            Key::W =&gt; Some(0x05),
+            Key::E =&gt; Some(0x06),
+            Key::R =&gt; Some(0x0D),
+
+            Key::A =&gt; Some(0x07),
+            Key::S =&gt; Some(0x08),
+            Key::D =&gt; Some(0x09),
+            Key::F =&gt; Some(0x0E),
+
+            Key::Z =&gt; Some(0x0A),
+            Key::X =&gt; Some(0x00),
+            Key::C =&gt; Some(0x0B),
+            Key::V =&gt; Some(0x0F),
+
+            _ =&gt; None,
+        }
+    }
+}
+</code></pre>
+<p><code>to_chip8_key</code> metodu, <code>Key</code> cinsinden alınan tuşu, CHIP-8'in
+anlayabileceği türe çevirmeye yarıyor ve basılan tuş eğer CHIP-8 tuş
+takımında yoksa, değeri <code>None</code> yapıyor.</p>
+<h1><a class="header" href="#emülasyon-döngüsü" id="emülasyon-döngüsü">Emülasyon Döngüsü</a></h1>
+<p>Tüm bileşenleri yazdığımıza göre artık emülasyon döngüsünü kurabiliriz.
+Öncelikle gerekli kullanımları yapalım:</p>
+<pre><code class="language-rust no_run noplaypen">use std::thread::sleep;
+use std::time::Duration;
+</code></pre>
+<p>CHIP-8 oyunları kendi işlemci hızında çalışabilecek şekilde
+programlandığından, modern bir işlemcide çok hızlı çalışacaktır. Bu
+problemi her bir instructiondan sonra belirli bir süre bekleyerek
+çözebiliriz. Çalışan thread'ımızda hiç bir şey yapmadan bekleyebileceğimiz
+<code>sleep</code> fonksiyonunu modülümüze ekledik.</p>
+<p>Ardıdan emülasyon metodunu <code>impl Emulator</code> bloğu içerisine oluşturalım:</p>
+<pre><code class="language-rust no_run noplaypen">    pub fn emulate(&amp;mut self) {
+        while self.display.is_open() {
+            self.display.as_mut().update();
+
+            if let Some(keys) = self.display.as_mut().get_keys() {
+                keys.iter().for_each(|key| self.keyboard.press_key(*key));
+                if keys.is_empty() {
+                    self.keyboard.release_key();
+                }
+            }
+
+            let instruction = self.instruction_oku().expect(&quot;Bilinmeyen Instruction&quot;);
+            self.instruction_calistir(instruction);
+
+            if self.delay_timer &gt; 0 {
+                self.delay_timer -= 1;
+            }
+
+            if self.sound_timer &gt; 0 {
+                if self.sound_timer == 1 {
+                    println!(&quot;BEEP!&quot;);
+                }
+                self.sound_timer -= 1;
+            }
+
+            sleep(Duration::from_millis(5));
+        }
+    }
+</code></pre>
+<p>Döngümüz pencere açık olduğu süre boyunca çalışacak.</p>
+<p><code>Display</code> tipine eklemiş olduğumuz ve referanstan-referansa dönüştürme
+işlemi yapan <code>AsMut</code> özelliği sayesinde, <code>self.display.as_mut()</code> diyerek,
+pencere yapısına ulaşabiliyoruz. minifb'de yer alan
+<a href="https://docs.rs/minifb/0.13.0/minifb/struct.Window.html#method.update"><code>update()</code></a>
+metodu, çizim yapmasak bile basılan tuşları alabilmemiz için çalıştırmamız
+gereken bir metod.</p>
+<pre><code class="language-rust no_run noplaypen">            if let Some(keys) = self.display.as_mut().get_keys() {
+                keys.iter().for_each(|key| self.keyboard.press_key(*key));
+                if keys.is_empty() {
+                    self.keyboard.release_key();
+                }
+            }
+
+            let instruction = self.instruction_oku().expect(&quot;Bilinmeyen Instruction&quot;);
+            self.instruction_calistir(instruction);
+
+            if self.delay_timer &gt; 0 {
+                self.delay_timer -= 1;
+            }
+
+            if self.sound_timer &gt; 0 {
+                if self.sound_timer == 1 {
+                    println!(&quot;BEEP!&quot;);
+                }
+                self.sound_timer -= 1;
+            }
+
+            sleep(Duration::from_millis(5));
+        }
+    }
+}
+</code></pre>
+<p>Burada penceremizden basılan tuşların bir listesini alıyoruz. Bu fonksiyon
+<code>Option</code> dönen bir fonksiyon olduğundan, Rust'a ait <code>if let</code> sözdizimini
+kullanabiliriz. Bu if bloğu sadece <code>self.display.as_mut().get_keys()</code>
+metodu <code>Some</code> döndüğünde çalışır. Ardından klavye alanına basılan tuşu
+aktarıyoruz. <code>get_keys()</code> metodunun boş dönmesi durumunda basılan tuşu
+geri bırakmak için klavye yapımızda kullandığımız <code>release_key()</code> metodunun
+çalıştırıyoruz.</p>
+<pre><code class="language-rust no_run noplaypen">            let instruction = self.instruction_oku().expect(&quot;Bilinmeyen Instruction&quot;);
+            self.instruction_calistir(instruction);
+</code></pre>
+<p>Daha önce yazdığımız instructionların okunması ve çalıştırılması işlemi
+burada gerçekleştiriliyor. <code>expect()</code> metodu <code>Option</code> dönen
+<code>instruction_oku()</code> metodundan <code>None</code> dönülmesi durumunda, &quot;Bilinmeyen
+Instruction&quot; hata mesajıyla birlikte panikleyip çıkmamızı sağlıyor.</p>
+<pre><code class="language-rust no_run noplaypen">            if self.delay_timer &gt; 0 {
+                self.delay_timer -= 1;
+            }
+
+            if self.sound_timer &gt; 0 {
+                if self.sound_timer == 1 {
+                    println!(&quot;BEEP!&quot;);
+                }
+                self.sound_timer -= 1;
+            }
+
+            sleep(Duration::from_millis(5));
+</code></pre>
+<p>Son olarak CHIP-8'in timerlarını birer sayı azaltıp, her instructiondan
+sonra 5 mili saniye bekleyerek döngümüzü tamamlıyoruz. Herhangi bir ses
+arabirimi kullanmadığımızdan, ses için şimdilik ekrana &quot;BEEP!&quot; mesajını
+yazdırıyoruz. İsterseniz siz bir ses paketi kullanarak bilgisayardan ses
+çıkmasını da sağlayabilirsiniz.</p>
+<h2><a class="header" href="#main-fonksiyonu" id="main-fonksiyonu"><code>main()</code> fonksiyonu</a></h2>
+<p>Artik emülatörümüz tüm bileşenleriyle hazır. Tek yapmamız gereken program
+başladığında çalışacak olan <code>main</code> fonksiyonunu tanımlamak. Bunun için
+program çalıştığında, program argümanlarını almamıza yarayacak
+<code>std::env::args</code> fonksiyonunu dahil edelim ve main fonksiyonumuzu yazalım:</p>
+<pre><code class="language-rust no_run noplaypen">use std::env::args;
+
+fn main() {
+    Emulator::new()
+        .rom_oku(args().nth(1).unwrap_or_else(|| &quot;brix.ch8&quot;.to_string()))
+        .expect(&quot;ROM okurken hata oluştu&quot;)
+        .emulate();
+}
+</code></pre>
+<p><code>args().nth(1).unwrap_or_else(|| &quot;brix.ch8&quot;.to_string())</code> söz dizimi,
+program argümanlarından ilkini almaya ve eğer herhangi bir argüman
+girilmezse de varsayılan olarak <code>brix.ch8</code> stringini dönmeye yarıyor. Bu
+sayede emülatörümüz istenildiği taktirde farklı bir ROM'u oynatabilir.
+<code>args()</code> fonksiyonu <code>String</code> cinsinden değerler döndüğü için
+<code>&quot;brix.ch8&quot;</code>'in de <code>String</code>'e dönüştürülmesi gerekli. Bu işlem için
+<code>to_string()</code> metodunu kullandık.</p>
+<p>Eğer hatırlarsanız <code>rom_oku()</code> metodunu yazarken instance sahipliğini
+almıştık ve dönüş değeri olarak yine almış olduğumuz sahipliği dönmüştük.
+Bu sayede <code>expect()</code> ile hatadan kurtarılan instance'a <code>emulate()</code> metodunu
+zincir halinde kullanabiliyoruz.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
