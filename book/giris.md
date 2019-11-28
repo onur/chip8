@@ -2,12 +2,11 @@
 
 Bu kitap Rust Programlama Dili ve farklı mimariler için emülatör yapımını
 öğrenmek isteyenler için yazılmış eğitici bir belgedir. Yazı programlamayı
-sıfırdan öğretmeyi amaçlamamaktadır ve okuyucuların daha
-önce en az bir programlama dili bildiği varsayılmıştır. Aynı zamanda
-emülatör geliştirirken lazım olan bir çok bitdüzeyi (bitwise) işlem
-kullanılmıştır. Bitdüzeyi işlemler olabildiğince anlaşılır bir dilde
-açıklanmasına rağmen, okuyucuların konu hakkında daha önce bilgili olması
-anlamalarını daha da kolaylaştıracaktır.
+sıfırdan öğretmemektedir ve okuyucuların daha önce en az bir programlama dili
+bildiği varsayılmıştır. Aynı zamanda emülatör geliştirirken lazım olan bir çok
+bitdüzeyi (bitwise) işlem kullanılmıştır. Bitdüzeyi işlemler olabildiğince
+anlaşılır bir dilde açıklanmasına rağmen, okuyucuların konu hakkında daha önce
+bilgili olması anlamalarını daha da kolaylaştıracaktır.
 
 ## Neden CHIP-8 Emülatörü Yazmalıyım?
 
@@ -16,16 +15,15 @@ anlamalarını daha da kolaylaştıracaktır.
 kullanıldığından bu sistem için geliştirilecek bir emülatör projesi,
 gerekse modern CPU'ların çalışma prensibini ve temelinde bir sistem
 programlama dili olan Rust'ı öğrenmek için en iyi başlangıç
-projelerinden biridir. Yıllardır Rust Programlama Dili'ni öğrenmek
+projelerinden biridir. Yıllardır Rust programlama dilini öğrenmek
 isteyenlere bir CHIP-8 emülatörü yazarak başlamalarını tavsiye ederim.
 
 ## Yazar Hakkında
 
-Rust Programlama Dili'ni stabil sürümü çıkmadan, beta sürecinden beri
-gündelik yaşamımda kullanmaktayım. Rust için belgeleme aracı olan
-[Docs.rs](https://docs.rs)'i geliştirdim ve Mozilla'nın Rust Programlama
-Dili organizasyonunda geliştirmesine devam etmekteyim. Bana
-ulaşabileceğiniz kanallar:
+Rust'ı stabil sürümü çıkmadan, beta sürecinden beri gündelik yaşamımda
+kullanmaktayım. Rust için belgeleme aracı olan [Docs.rs](https://docs.rs)'i
+geliştirdim ve Mozilla'nın Rust Programlama Dili organizasyonunda
+geliştirmesine devam etmekteyim. Bana ulaşabileceğiniz kanallar:
 
 * GitHub: <https://github.com/onur>
 * Twitter: <https://twitter.com/oasln>
