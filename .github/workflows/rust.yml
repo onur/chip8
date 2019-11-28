@@ -3,13 +3,29 @@ name: Rust
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v1
+    - name: rustc version
+      run: rustc --version
     - name: Build
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get mdbook
+      run: wget https://github.com/rust-lang/mdBook/releases/download/v0.3.5/mdbook-v0.3.5-x86_64-unknown-linux-gnu.tar.gz -O - | tar xzf -
+    - name: Build Book
+      run: cd book && ../mdbook build
+    - name: GitHub Pages
+      uses: crazy-max/ghaction-github-pages@v1.2.5
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          build_dir: book/book
