@@ -13,7 +13,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: target
-        key: ${{ runner.OS }}-build-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.OS }}-build-${{ hashFiles('Cargo.toml') }}
     - name: Build
       run: cargo build --verbose
     - name: Run tests
