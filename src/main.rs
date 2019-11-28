@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 #![warn(clippy::pedantic)]
+#![warn(clippy::cast_possible_truncation)]
 #![allow(clippy::unreadable_literal)]
 
 mod display;
