@@ -28,9 +28,9 @@ jobs:
       run: wget https://github.com/rust-lang/mdBook/releases/download/v0.3.5/mdbook-v0.3.5-x86_64-unknown-linux-gnu.tar.gz -O - | tar xzf -
     - name: Build Book
       run: cd book && ../mdbook build
-    - name: GitHub Pages
-      uses: crazy-max/ghaction-github-pages@v1.2.5
+    - name: GitHub Pages Deploy
+      uses: peaceiris/actions-gh-pages@v2.5.0
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          build_dir: book/book
+          ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: ./book/book
