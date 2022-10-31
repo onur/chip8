@@ -47,7 +47,7 @@ impl Display {
 
                 if sprite & (0x80 >> i) != 0 {
                     if self.buffer[yj][xi] == 1 {
-                        collision = 1
+                        collision = 1;
                     }
                     self.buffer[yj][xi] ^= 1;
                 }

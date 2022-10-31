@@ -259,7 +259,7 @@ impl Emulator {
             }
             Instruction::LoadRegisters(x) => {
                 for i in 0..=x {
-                    self.v[i] = self.memory[self.i as usize + i]
+                    self.v[i] = self.memory[self.i as usize + i];
                 }
                 self.i += x as u16 + 1;
                 self.pc + 2
