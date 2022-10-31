@@ -103,10 +103,10 @@ impl Emulator {
                 }
             }
             Instruction::SkipIfNotEqualsByte(x, v) => {
-                if self.v[x] == v {
-                    self.pc + 2
-                } else {
+                if self.v[x] != v {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::SkipIfEqual(x, y) => {
@@ -169,10 +169,10 @@ impl Emulator {
                 self.pc + 2
             }
             Instruction::SkipIfNotEqual(x, y) => {
-                if self.v[x] == self.v[y] {
-                    self.pc + 2
-                } else {
+                if self.v[x] != self.v[y] {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::LoadI(addr) => {
