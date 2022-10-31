@@ -80,7 +80,7 @@ için öncelikle `oxoo` metodunu kullanmamız gerekli. Bu metod şu işlemleri
 yapmaktadır:
 
 ```
-0x71AA     111000110101010  XOR
+0x71AA     111000110101010  AND
 0x0F00     000111100000000
 0x0100     000000100000000  >> 8
 0x0001     000000000000001  # 16-bit uzunluğundaki sayı, CHIP-8'de sadece 16
@@ -91,7 +91,7 @@ yapmaktadır:
 Ardından `0xAA` sayısı alınabilmesi için `oonn` metodu kullanılır:
 
 ```
-0x71AA     111000110101010  XOR
+0x71AA     111000110101010  AND
 0x00FF     000000011111111
 0x00AA     000000010101010  # Son iki basamak sadece 8-bit uzunluğunda
                             # olabileceğinden çıkan sonuç 8-bit'e dönüştürülür
