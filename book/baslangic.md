@@ -65,5 +65,5 @@ minifb = "0.13"
 işletim sistemlerinde (Windows, OSX ve Linux) basit bir şekilde pencere
 oluşturup cizim yapmaya yarar.
 
-Biz projemizde Rust 2018 yayınını kullandığımızdan, paketimiz içine tekrar
+Biz projemizde Rust 2021 yayınını kullandığımızdan, paketimiz içine tekrar
 `extern crate` tanımlaması yapmamıza gerek yok.
