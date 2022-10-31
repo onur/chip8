@@ -36,7 +36,7 @@ impl From<u16> for Opcode {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Instruction {
     /// 0x00E0 CLS: Ekranı temizler
     ClearDisplay,
