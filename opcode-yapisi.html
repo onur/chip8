@@ -240,7 +240,7 @@ dönen <code>oxoo</code>, <code>ooyo</code> metodları <code>usize</code> dönme
 ele alalım. <code>0x71AA</code> sayısında ikinci basamakta yer alan <code>1</code> değerini almak
 için öncelikle <code>oxoo</code> metodunu kullanmamız gerekli. Bu metod şu işlemleri
 yapmaktadır:</p>
-<pre><code>0x71AA     111000110101010  XOR
+<pre><code>0x71AA     111000110101010  AND
 0x0F00     000111100000000
 0x0100     000000100000000  &gt;&gt; 8
 0x0001     000000000000001  # 16-bit uzunluğundaki sayı, CHIP-8'de sadece 16
@@ -248,7 +248,7 @@ yapmaktadır:</p>
 0x01              00000001
 </code></pre>
 <p>Ardından <code>0xAA</code> sayısı alınabilmesi için <code>oonn</code> metodu kullanılır:</p>
-<pre><code>0x71AA     111000110101010  XOR
+<pre><code>0x71AA     111000110101010  AND
 0x00FF     000000011111111
 0x00AA     000000010101010  # Son iki basamak sadece 8-bit uzunluğunda
                             # olabileceğinden çıkan sonuç 8-bit'e dönüştürülür

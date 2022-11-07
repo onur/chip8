@@ -262,7 +262,7 @@ sonlandırabilir.</p>
 
                 if sprite &amp; (0x80 &gt;&gt; i) != 0 {
                     if self.buffer[yj][xi] == 1 {
-                        collision = 1
+                        collision = 1;
                     }
                     self.buffer[yj][xi] ^= 1;
                 }

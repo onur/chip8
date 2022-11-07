@@ -321,7 +321,7 @@ minifb = &quot;0.13&quot;
 <p><code>rand</code> paketi rastgele bir sayı üretmeye yarar, <code>minifb</code> paketi en yaygın
 işletim sistemlerinde (Windows, OSX ve Linux) basit bir şekilde pencere
 oluşturup cizim yapmaya yarar.</p>
-<p>Biz projemizde Rust 2018 yayınını kullandığımızdan, paketimiz içine tekrar
+<p>Biz projemizde Rust 2021 yayınını kullandığımızdan, paketimiz içine tekrar
 <code>extern crate</code> tanımlaması yapmamıza gerek yok.</p>
 <h1><a class="header" href="#opcode-yapısı" id="opcode-yapısı">Opcode Yapısı</a></h1>
 <p>CHIP-8'in tüm OPCODE'ları 16-bit uzunluğundadır. Bu nedenle çok basit bir
@@ -411,7 +411,7 @@ dönen <code>oxoo</code>, <code>ooyo</code> metodları <code>usize</code> dönme
 ele alalım. <code>0x71AA</code> sayısında ikinci basamakta yer alan <code>1</code> değerini almak
 için öncelikle <code>oxoo</code> metodunu kullanmamız gerekli. Bu metod şu işlemleri
 yapmaktadır:</p>
-<pre><code>0x71AA     111000110101010  XOR
+<pre><code>0x71AA     111000110101010  AND
 0x0F00     000111100000000
 0x0100     000000100000000  &gt;&gt; 8
 0x0001     000000000000001  # 16-bit uzunluğundaki sayı, CHIP-8'de sadece 16
@@ -419,7 +419,7 @@ yapmaktadır:</p>
 0x01              00000001
 </code></pre>
 <p>Ardından <code>0xAA</code> sayısı alınabilmesi için <code>oonn</code> metodu kullanılır:</p>
-<pre><code>0x71AA     111000110101010  XOR
+<pre><code>0x71AA     111000110101010  AND
 0x00FF     000000011111111
 0x00AA     000000010101010  # Son iki basamak sadece 8-bit uzunluğunda
                             # olabileceğinden çıkan sonuç 8-bit'e dönüştürülür
@@ -975,10 +975,10 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
                 }
             }
             Instruction::SkipIfNotEqualsByte(x, v) =&gt; {
-                if self.v[x] == v {
-                    self.pc + 2
-                } else {
+                if self.v[x] != v {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::SkipIfEqual(x, y) =&gt; {
@@ -1041,10 +1041,10 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
                 self.pc + 2
             }
             Instruction::SkipIfNotEqual(x, y) =&gt; {
-                if self.v[x] == self.v[y] {
-                    self.pc + 2
-                } else {
+                if self.v[x] != self.v[y] {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::LoadI(addr) =&gt; {
@@ -1131,7 +1131,7 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
             }
             Instruction::LoadRegisters(x) =&gt; {
                 for i in 0..=x {
-                    self.v[i] = self.memory[self.i as usize + i]
+                    self.v[i] = self.memory[self.i as usize + i];
                 }
                 self.i += x as u16 + 1;
                 self.pc + 2
@@ -1249,7 +1249,7 @@ sonlandırabilir.</p>
 
                 if sprite &amp; (0x80 &gt;&gt; i) != 0 {
                     if self.buffer[yj][xi] == 1 {
-                        collision = 1
+                        collision = 1;
                     }
                     self.buffer[yj][xi] ^= 1;
                 }

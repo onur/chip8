@@ -202,10 +202,10 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
                 }
             }
             Instruction::SkipIfNotEqualsByte(x, v) =&gt; {
-                if self.v[x] == v {
-                    self.pc + 2
-                } else {
+                if self.v[x] != v {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::SkipIfEqual(x, y) =&gt; {
@@ -268,10 +268,10 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
                 self.pc + 2
             }
             Instruction::SkipIfNotEqual(x, y) =&gt; {
-                if self.v[x] == self.v[y] {
-                    self.pc + 2
-                } else {
+                if self.v[x] != self.v[y] {
                     self.pc + 4
+                } else {
+                    self.pc + 2
                 }
             }
             Instruction::LoadI(addr) =&gt; {
@@ -358,7 +358,7 @@ saklandığı için, bu durumu kolayca <code>F</code> registerine atayabiliriz.<
             }
             Instruction::LoadRegisters(x) =&gt; {
                 for i in 0..=x {
-                    self.v[i] = self.memory[self.i as usize + i]
+                    self.v[i] = self.memory[self.i as usize + i];
                 }
                 self.i += x as u16 + 1;
                 self.pc + 2
